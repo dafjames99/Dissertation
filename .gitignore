@@ -7,3 +7,5 @@ __pycache__/
 
 src/data/
 src/utils/github_credentials.txt
+
+src/utils/vars.py
