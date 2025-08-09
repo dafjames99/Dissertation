@@ -6,6 +6,4 @@ __pycache__/
 !latex/report.pdf
 
 src/data/
-src/utils/github_credentials.txt
-
-src/utils/vars.py
+/Docs/*
