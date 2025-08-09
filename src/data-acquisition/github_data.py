@@ -1,3 +1,4 @@
+import os
 import argparse
 import sys, time
 import numpy as np, pandas as pd
@@ -13,7 +14,8 @@ src_path = Path(__file__).resolve().parent.parent
 sys.path.append(str(src_path))
 
 from utils.paths import DATA_DICT
-from utils.vars import GITHUB_TOKEN
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 class GitHubGraphQL: 
     def __init__(self, repo_name, github_token, schema_filepath = DATA_DICT['gql']['schema'], **kwargs):
