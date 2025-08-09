@@ -1,0 +1,34 @@
+query ($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    readme_docs_md: object(expression: "HEAD:docs/README.md") {
+      ... on Blob {
+        text
+      }
+    }
+    readme_MD: object(expression: "HEAD:README.md") {
+      ... on Blob {
+        text
+      }
+    }
+    readme_md: object(expression: "HEAD:README.MD") {
+      ... on Blob {
+        text
+      }
+    }
+    readme_rst: object(expression: "HEAD:README.rst") {
+      ... on Blob {
+        text
+      }
+    }
+    readme_txt: object(expression: "HEAD:README.txt") {
+      ... on Blob {
+        text
+      }
+    }
+    readme_cap: object(expression: "HEAD:Readme.md") {
+      ... on Blob {
+        text
+      }
+    }
+  }
+}

@@ -1,3 +1,9 @@
-node_modules/
-.env
+.vscode/
+venv/
 __pycache__/
+
+/latex/*
+!latex/report.pdf
+
+src/data/
+src/utils/github_credentials.txt

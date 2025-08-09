@@ -1,0 +1,21 @@
+query ($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+        stargazers(
+            first: 100,
+            after: $after,
+            orderBy: {
+                field: STARRED_AT,
+                direction: ASC
+            }
+        ){
+            edges {
+                starredAt
+                cursor
+            }
+            pageInfo {
+                endCursor
+                hasNextPage
+            }
+        }
+    }
+}
