@@ -131,18 +131,18 @@ class SimilarityCalculator(UtilityClass):
         """
         ))
 
-sim_v1 = SimilarityCalculator(
-    text_variant='v1',
-    sentence_model_index='b'
-)
+# sim_v1 = SimilarityCalculator(
+#     text_variant='v1',
+#     sentence_model_index='b'
+# )
 
-sim_v2 = SimilarityCalculator(
-    text_variant='v2',
-    sentence_model_index='b'
-)
-i = 15000
-sim_v1.demonstrate(i, 'highest')
-sim_v2.demonstrate(i, 'highest')
+# sim_v2 = SimilarityCalculator(
+#     text_variant='v2',
+#     sentence_model_index='b'
+# )
+# i = 15000
+# sim_v1.demonstrate(i, 'highest')
+# sim_v2.demonstrate(i, 'highest')
 
 class EmbeddingSimilarity:
     
@@ -442,27 +442,27 @@ def plot_similarity_ribbon(df, period_col='Q', remove_zeros = True):
     plt.show()
 
 
-sim = EmbeddingSimilarity('b', 'v1')
+# sim = EmbeddingSimilarity('b', 'v1')
 
-df = sim.repo_stars_similarity(
-    'pytorch/pytorch',
-    'Q',
-    np.mean,
-    np.median,
-    np.count_nonzero,
-    np.sum,
-    np.min,
-    np.max,
-    np.std,
-    np.var, 
-    drop_zero = True
-)
+# df = sim.repo_stars_similarity(
+#     'pytorch/pytorch',
+#     'Q',
+#     np.mean,
+#     np.median,
+#     np.count_nonzero,
+#     np.sum,
+#     np.min,
+#     np.max,
+#     np.std,
+#     np.var, 
+#     drop_zero = True
+# )
 
 
-similarity_cols = [col for col in df.columns if col.endswith('_similarity')]
+# similarity_cols = [col for col in df.columns if col.endswith('_similarity')]
 
-plot_time_series(df, period_col='Q', star_col='stars_norm', similarity_cols=similarity_cols)
-plot_similarity_ribbon(df)
+# plot_time_series(df, period_col='Q', star_col='stars_norm', similarity_cols=similarity_cols)
+# plot_similarity_ribbon(df)
         
 # -----------------------------------------------------
 # -------------- COMPARISON of v1 and v2 --------------

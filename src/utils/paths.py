@@ -1,14 +1,12 @@
 from pathlib import Path
 from typing import TypedDict
 
-
-# --- I have some experience with TypeScript, and I love the explict features it provides ---
+# --- I have some experience with TypeScript, and I love the static programming it embodies ---
 
 # --- I made this TypedDict structure ---
 # --- It helps with Typing the DATA_DICT contents ---
 # --- Pylance understands the contents of the DATA_DICT now ---
 # --- Autocomplete suggestions in other files when I import DATA_DICT ! ---
-
 
 # --- This whole file serves as a central & explicit location for me to keep track of what data is where, and an easy method of accessing ---
 # --- Side benefit: Easy management of anomyzied data access in other files
