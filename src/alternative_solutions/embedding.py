@@ -16,80 +16,130 @@ from nltk.corpus import stopwords
 src_path = Path(__file__).resolve().parent.parent
 sys.path.append(str(src_path))
 
-from utils.paths import DATA_DICT, SENTENCE_MODEL, TEXT_VARIANTS, POS_TAGS, NOISY_SECTION_PATTERN, HEURISTIC_KWS, TOPIC_KWS
-    
+from utils.paths import (
+    DATA_DICT,
+    SENTENCE_MODEL,
+    TEXT_VARIANTS,
+    POS_TAGS,
+    NOISY_SECTION_PATTERN,
+    HEURISTIC_KWS,
+    TOPIC_KWS,
+)
+
 # ---------------------------------------------------------------------------------
 # --------------------------- (Shared) Create Embedding ---------------------------
 # ---------------------------------------------------------------------------------
 
+
 class CreateEmbedding:
-    def __init__(self, sentence_model_index: str, text_variant: Literal['text', 'text2']):
+    def __init__(self, sentence_model_index: str, text_variant: Literal["v1", "v2"]):
         self.sentence_model_index = sentence_model_index
         try:
-            self.sentence_model = SentenceTransformer(SENTENCE_MODEL[sentence_model_index])
+            self.sentence_model = SentenceTransformer(
+                SENTENCE_MODEL[sentence_model_index]
+            )
         except:
             raise f"Use a Proper sentence model index - one of [{[k for k in SENTENCE_MODEL.keys()]}]"
-        self.text_content_variant = text_variant    
-    
-    def load_text(self, data_channel: Literal['jobs', 'repositories']) -> list[str]:
-        text = pd.read_csv(DATA_DICT['embeddings'][self.text_content_variant][f'{data_channel}_texts'])[f"{data_channel}_texts"].tolist()
+        self.text_content_variant = text_variant
+
+    def load_text(self, data_channel: Literal["jobs", "repositories"]) -> list[str]:
+        text = pd.read_csv(
+            DATA_DICT["embeddings"][self.text_content_variant][f"{data_channel}_texts"]
+        )[f"{data_channel}_texts"].tolist()
         return text
 
-    def generate_embeddings(self, data_channel: Literal['jobs', 'repositories'], path = None, save_to_file: bool = True) -> np.array:
-        """ 
-        For the specified data-channel (jobs / repositories), generates the correpsonding sentence-transformer embeddings 
+    def generate_embeddings(
+        self,
+        data_channel: Literal["jobs", "repositories"],
+        path=None,
+        save_to_file: bool = True,
+    ) -> np.array:
+        """
+        For the specified data-channel (jobs / repositories), generates the correpsonding sentence-transformer embeddings
         if save_to_file is True, saved to the directory in embeddings/{text_variant}
         """
         text_list = self.load_text(data_channel)
 
         if path is None:
             try:
-                path = DATA_DICT['embeddings'][self.text_content_variant][f"{data_channel}_embed_{self.sentence_model_index}"]
+                path = DATA_DICT["embeddings"][self.text_content_variant][
+                    f"{data_channel}_embed_{self.sentence_model_index}"
+                ]
             except:
-                print(f'Create an entry for "{data_channel}_embed_{self.sentence_model_index}" in the DATA_DICT')
+                print(
+                    f'Create an entry for "{data_channel}_embed_{self.sentence_model_index}" in the DATA_DICT'
+                )
         if Path.exists(path):
-            print(f'EXIT (Already exists): {path} \n Loading Embeddings..')
+            print(f"EXIT (Already exists): {path} \n Loading Embeddings..")
             embeddings = np.load(path)
         else:
-            print(f"GENERATING: Embeddings for {data_channel} with {self.text_content_variant} texts ...")
+            print(
+                f"GENERATING: Embeddings for {data_channel} with {self.text_content_variant} texts ..."
+            )
             embeddings = self.sentence_model.encode(
-                text_list,normalize_embeddings=True,show_progress_bar=True
+                text_list, normalize_embeddings=True, show_progress_bar=True
             )
             if save_to_file:
                 np.save(path, embeddings)
         return embeddings
 
+
 # ---------------------------------------------------------------------------------
 # ------------------------------ V1 - Text Variant 1 ------------------------------
 # ---------------------------------------------------------------------------------
 
+
 def generate_v1_text(out_paths, df_jobs, df_repos):
-    
-    if not Path.exists(out_paths['jobs']):
-        jobs_texts = (
-            df_jobs['title'] + ' ' +
-            df_jobs['description']
-        ).tolist()
-        pd.DataFrame(jobs_texts, columns = [f"jobs_texts"]).to_csv(out_paths['jobs'], index = False)
+    if not Path.exists(out_paths["jobs"]):
+        jobs_texts = (df_jobs["title"] + " " + df_jobs["description"]).tolist()
+        pd.DataFrame(jobs_texts, columns=[f"jobs_texts"]).to_csv(
+            out_paths["jobs"], index=False
+        )
     else:
-        print(f'EXIT (Already exists): {out_paths['jobs']}')
-    if not Path.exists(out_paths['repositories']):
+        print(f"EXIT (Already exists): {out_paths['jobs']}")
+    if not Path.exists(out_paths["repositories"]):
         repo_texts = (
-            df_repos['owner'] + ' ' +
-            df_repos['repo'] + ' ' +
-            df_repos['topics'].str.replace(',', ' ') + ' ' +
-            df_repos['description'] + ' ' +
-            df_repos['readme']
+            df_repos["owner"]
+            + " "
+            + df_repos["repo"]
+            + " "
+            + df_repos["topics"].str.replace(",", " ")
+            + " "
+            + df_repos["description"]
+            + " "
+            + df_repos["readme"]
         ).tolist()
-        pd.DataFrame(repo_texts, columns = [f"repositories_texts"]).to_csv(out_paths['repositories'], index = False)
+        pd.DataFrame(repo_texts, columns=[f"repositories_texts"]).to_csv(
+            out_paths["repositories"], index=False
+        )
     else:
-        print(f'EXIT (Already exists): {out_paths['repositories']}')
+        print(f"EXIT (Already exists): {out_paths['repositories']}")
+
 
 # ---------------------------------------------------------------------------------
 # ------------------------------ V2 - Text Variant 2 ------------------------------
 # ---------------------------------------------------------------------------------
 
-POS_TAGS = ["ADJ","ADP","ADV","AUX","CCONJ","DET","INTJ","NOUN","NUM","PART","PRON","PROPN","PUNCT","SCONJ","SYM","VERB","X"]
+POS_TAGS = [
+    "ADJ",
+    "ADP",
+    "ADV",
+    "AUX",
+    "CCONJ",
+    "DET",
+    "INTJ",
+    "NOUN",
+    "NUM",
+    "PART",
+    "PRON",
+    "PROPN",
+    "PUNCT",
+    "SCONJ",
+    "SYM",
+    "VERB",
+    "X",
+]
+
 
 def ensure_stopwords_downloaded():
     try:
@@ -97,25 +147,25 @@ def ensure_stopwords_downloaded():
     except LookupError:
         nltk.download("stopwords")
 
+
 class TextProcessor:
     def __init__(
         self,
-        case_correct = True,
-        remove_stopwords = True,
-        ):
+        case_correct=True,
+        remove_stopwords=True,
+    ):
         ensure_stopwords_downloaded()
         self.nlp = spacy.load("en_core_web_sm")
-        case_map = pd.read_csv(DATA_DICT['github']['tags']['case_map'])
-        self.case_map_dict = dict(zip(case_map['lower'], case_map['proper']))
+        case_map = pd.read_csv(DATA_DICT["github"]["tags"]["case_map"])
+        self.case_map_dict = dict(zip(case_map["lower"], case_map["proper"]))
         self.methods = self.getmethods()
         self.remove_stopwords = remove_stopwords
         self.stopwords = set(stopwords.words("english"))
         self.case_correct = case_correct
-    
 
     def case_correct_word(self, lower_word: str):
         return self.case_map_dict.get(lower_word, lower_word)
-    
+
     def case_correct_word(self, word: str):
         """
         if the word (lower) is an instance of a github-tag as composed by the retrieved list of topic-tags that are retrieved from the github repostiories,
@@ -126,74 +176,92 @@ class TextProcessor:
         - tensorflow -> TensorFlow
         """
         return self.case_map_dict.get(word.lower(), word)
-    
+
     def getmethods(self):
-        methods_list = [method for method in dir(self) if callable(getattr(self, method)) and method.startswith('BY')]
+        methods_list = [
+            method
+            for method in dir(self)
+            if callable(getattr(self, method)) and method.startswith("BY")
+        ]
         return methods_list
 
     def filter_sentence(self, doc: spacy.tokens.Doc, method, **kwargs):
-        return getattr(self, method)(doc = doc, **kwargs)
-                
-    def transform(self, doc: spacy.tokens.Doc, *methods, logical_operation = any, lemmatize = True, visualise = False, **kwargs):
+        return getattr(self, method)(doc=doc, **kwargs)
+
+    def transform(
+        self,
+        doc: spacy.tokens.Doc,
+        *methods,
+        logical_operation=any,
+        lemmatize=True,
+        visualise=False,
+        **kwargs,
+    ):
         """
         Returns a tuple: output-text, HTML
-        
+
         The output-text is the transformed-text; HTML displays highlighted text-block, demonstrating which tokens were kept/removed
         """
-        contain = [True]*len(doc)
+        contain = [True] * len(doc)
         if len(methods) != 0:
             for sentence in doc.sents:
                 sentence_doc = self.nlp(sentence.text)
-                truth_values = [self.filter_sentence(sentence_doc, m, **kwargs) for m in methods]
+                truth_values = [
+                    self.filter_sentence(sentence_doc, m, **kwargs) for m in methods
+                ]
                 if not logical_operation(truth_values):
                     for i in range(sentence.start, sentence.end):
                         contain[i] = False
         for i, token in enumerate(doc):
             if token.is_alpha:
-                if lemmatize: 
+                if lemmatize:
                     obj = token.lemma_
-                else: 
+                else:
                     obj = token.text
                 if obj.lower() in self.stopwords:
                     contain[i] = False
         out, html = [], []
         for i in range(len(doc)):
-            obj =  (doc[i].lemma_ if lemmatize else doc[i].text)
+            obj = doc[i].lemma_ if lemmatize else doc[i].text
             if self.case_correct:
-                obj =  self.case_correct_word(obj)
+                obj = self.case_correct_word(obj)
             obj += doc[i].whitespace_
             if contain[i]:
                 out.append(obj)
-                html.append(f'<span style="color: green; font-weight: bold;">{obj}</span>')
+                html.append(
+                    f'<span style="color: green; font-weight: bold;">{obj}</span>'
+                )
             else:
                 html.append(f'<span style="color: #999;">{obj}</span>')
         if visualise:
-            return ''.join(out), display(HTML(''.join(html)))
+            return "".join(out), display(HTML("".join(html)))
         else:
-            return ''.join(out), None
-        
-    def batch_transform(self, texts, *methods, logical_operation = any, lemmatize = True, **kwargs):
+            return "".join(out), None
+
+    def batch_transform(
+        self, texts, *methods, logical_operation=any, lemmatize=True, **kwargs
+    ):
         out = []
         docs = self.nlp.pipe(texts, batch_size=32, n_process=4)
-        with tqdm(desc = "Batch Processing Texts", total = len(texts), unit = 'Texts') as pbar:
+        with tqdm(
+            desc="Batch Processing Texts", total=len(texts), unit="Texts"
+        ) as pbar:
             for doc in docs:
-                out.append(self.transform(
-                    doc,
-                    *methods,
-                    lemmatize=lemmatize,
-                    logical_operation=logical_operation,
-                    **kwargs)[0])
+                out.append(
+                    self.transform(
+                        doc,
+                        *methods,
+                        lemmatize=lemmatize,
+                        logical_operation=logical_operation,
+                        **kwargs,
+                    )[0]
+                )
                 pbar.update(1)
         return out
-           
+
+
 class JobTextProcessor(TextProcessor):
-    def __init__(
-        self, 
-        heuristic_keywords,
-        topic_keywords,
-        **kwargs
-        ):
-        
+    def __init__(self, heuristic_keywords, topic_keywords, **kwargs):
         super().__init__(**kwargs)
         self.heuristic_keywords = heuristic_keywords
         self.topic_keywords = topic_keywords
@@ -202,35 +270,54 @@ class JobTextProcessor(TextProcessor):
         self,
         doc: spacy.tokens.Doc,
         **kwargs,
-        ) -> bool:
-        """ Return True if the sentence contains any of the keywords defined in heuristic_keywords """
+    ) -> bool:
+        """Return True if the sentence contains any of the keywords defined in heuristic_keywords"""
         words = [token.text.lower() for token in doc]
         return any(word.lower() in words for word in self.heuristic_keywords)
-    
+
     def BY_contains_pos(
         self,
         doc: spacy.tokens.Doc,
-        pos: Literal ["ADJ","ADP","ADV","AUX","CCONJ","DET","INTJ","NOUN","NUM","PART","PRON","PROPN","PUNCT","SCONJ","SYM","VERB","X"],
+        pos: Literal[
+            "ADJ",
+            "ADP",
+            "ADV",
+            "AUX",
+            "CCONJ",
+            "DET",
+            "INTJ",
+            "NOUN",
+            "NUM",
+            "PART",
+            "PRON",
+            "PROPN",
+            "PUNCT",
+            "SCONJ",
+            "SYM",
+            "VERB",
+            "X",
+        ],
         remove_entities: list = None,
-        **kwargs
-        ) -> bool:
+        **kwargs,
+    ) -> bool:
         """
         Returns True if a word in the sentence has a word tagged as pos (Part of Speech)
         spaCy NLP tags each token with a POS tag - e.g. "VERB", "NOUN", etc.
-        
+
         remove_entities: write a list of recognised entity types that are discounted as being relevant.
         e.g. if pos = "PROPN", remove_entities = "PERSON" returns False for sentences where the PROPN terms are only PERSON
         """
-        if isinstance(pos, str): pos = [pos]
+        if isinstance(pos, str):
+            pos = [pos]
         for token in doc:
-            if any([token.pos_ == p for p in pos]): 
+            if any([token.pos_ == p for p in pos]):
                 if remove_entities is not None:
                     if token.ent_type_ not in remove_entities:
                         return True
                 else:
                     return True
         return False
-    
+
     def BY_contains_topic_chunk(self, doc: spacy.tokens.Doc, **kwargs):
         """
         Returns True if the sentence contains a noun phrase of at least `min_len` tokens.
@@ -240,30 +327,32 @@ class JobTextProcessor(TextProcessor):
                 return True
         return False
 
+
 class ReadmeCleaner:
     def __init__(
         self,
         noise_patterns,
-    ):  
+    ):
         self.noise_patterns = noise_patterns
-        
-        
+
     def is_noisy_title(self, title: str) -> bool:
-        return re.match(self.noise_patterns, title.strip(), re.VERBOSE | re.IGNORECASE) is not None
+        return (
+            re.match(self.noise_patterns, title.strip(), re.VERBOSE | re.IGNORECASE)
+            is not None
+        )
 
     def strip_inline_code_tags(self, soup: BeautifulSoup) -> BeautifulSoup:
-        for tag in soup.find_all(['code', 'pre']):
+        for tag in soup.find_all(["code", "pre"]):
             tag.decompose()
         return soup
-    
-    def create_soup(self, text: str) -> BeautifulSoup: 
-        return BeautifulSoup(markdown(text), 'html.parser')
+
+    def create_soup(self, text: str) -> BeautifulSoup:
+        return BeautifulSoup(markdown(text), "html.parser")
 
     def remove_nonsemantic_lists(self, soup: BeautifulSoup) -> BeautifulSoup:
-        
         def is_link_only_li(li):
             """Check if an <li> is a link or a non-semantic heading."""
-            allowed = {'a', 'strong', 'em', 'b', 'i', 'code'}
+            allowed = {"a", "strong", "em", "b", "i", "code"}
             return all(
                 (child.name in allowed or isinstance(child, str))
                 for child in li.contents
@@ -271,8 +360,8 @@ class ReadmeCleaner:
             )
 
         def is_removable_list(ul_or_ol):
-            for li in ul_or_ol.find_all('li', recursive=False):
-                nested_lists = li.find_all(['ul', 'ol'], recursive=False)
+            for li in ul_or_ol.find_all("li", recursive=False):
+                nested_lists = li.find_all(["ul", "ol"], recursive=False)
                 if nested_lists:
                     if not all(is_removable_list(nl) for nl in nested_lists):
                         return False
@@ -280,43 +369,44 @@ class ReadmeCleaner:
                     if not is_link_only_li(li):
                         return False
             return True
-        
-        for ul_or_ol in soup.find_all(['ul', 'ol']):
+
+        for ul_or_ol in soup.find_all(["ul", "ol"]):
             if is_removable_list(ul_or_ol):
                 ul_or_ol.decompose()
         return soup
 
     def remove_link_only_lists(self, soup: BeautifulSoup) -> BeautifulSoup:
-        for list_tag in soup.find_all(['ul', 'ol']):
-            lis = list_tag.find_all('li', recursive=False)
+        for list_tag in soup.find_all(["ul", "ol"]):
+            lis = list_tag.find_all("li", recursive=False)
             if lis and all(
-                len(li.contents) == 1 and li.find('a') and li.find('a') == li.contents[0]
+                len(li.contents) == 1
+                and li.find("a")
+                and li.find("a") == li.contents[0]
                 for li in lis
             ):
                 list_tag.decompose()
         return soup
 
-
     def remove_unwanted_sections(self, soup: BeautifulSoup) -> BeautifulSoup:
-        headers = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-        
+        headers = soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
+
         checked_headers = []
         for header in headers:
             if header in checked_headers:
                 continue
             else:
                 title = header.get_text(strip=True)
-               
+
                 try:
                     level = int(header.name[1])
                 except TypeError:
                     continue
-                
+
                 siblings = []
-               
+
                 for sibling in header.find_next_siblings():
-                    if (sibling.name is not None) and (sibling.name.startswith('h')):
-                        try: 
+                    if (sibling.name is not None) and (sibling.name.startswith("h")):
+                        try:
                             next_level = int(sibling.name[1])
                             if next_level <= level:
                                 break
@@ -336,14 +426,13 @@ class ReadmeCleaner:
                                 headers.remove(sibling)
                             sibling.decompose()
         return soup
-    
-    def full_soup_cleaner(self, soup: BeautifulSoup) -> BeautifulSoup: 
+
+    def full_soup_cleaner(self, soup: BeautifulSoup) -> BeautifulSoup:
         soup = self.strip_inline_code_tags(soup)
         # soup = self.remove_link_only_lists(soup)
         soup = self.remove_nonsemantic_lists(soup)
         soup = self.remove_unwanted_sections(soup)
         return soup
-
 
     def remove_markdown_tables(self, text: str) -> str:
         lines = text.splitlines()
@@ -356,7 +445,11 @@ class ReadmeCleaner:
             # Detect the alignment row (e.g. |---|:---:|---|)
             if re.match(r"^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$", stripped):
                 # Look back to see if previous line is a table header
-                if i > 0 and lines[i - 1].strip().startswith("|") and lines[i - 1].count("|") >= 2:
+                if (
+                    i > 0
+                    and lines[i - 1].strip().startswith("|")
+                    and lines[i - 1].count("|") >= 2
+                ):
                     in_table = True
                     continue
 
@@ -375,33 +468,36 @@ class ReadmeCleaner:
 
         return "\n".join(clean_lines)
 
-    
     def strip_rst_badges(self, text: str) -> str:
         text = re.sub(r"(?m)^\|(?:[^\n|]+\|)+\s*$", "", text)
-        text = re.sub(r"(?m)^\.\.\s*\|[^|]+\|\s+(image|replace)::.*(?:\n\s*:[^:]+:[^\n]*)*", "", text)
+        text = re.sub(
+            r"(?m)^\.\.\s*\|[^|]+\|\s+(image|replace)::.*(?:\n\s*:[^:]+:[^\n]*)*",
+            "",
+            text,
+        )
         text = re.sub(r"(?m)^\.\.\s*image::.*(?:\n\s*:[^:]+:[^\n]*)*", "", text)
         return text.strip()
 
     def strip_urls_keep_text(self, text: str) -> str:
-        soup = BeautifulSoup(markdown(text), 'html.parser')
-        for a in soup.find_all('a'):
+        soup = BeautifulSoup(markdown(text), "html.parser")
+        for a in soup.find_all("a"):
             a.replace_with(a.get_text())
         return soup.text
 
     def remove_code_blocks(self, text: str) -> str:
-        text = re.sub(r'```[\s\S]*?```', '', text)
-        text = re.sub(r'`[^`\n]+`', '', text)
+        text = re.sub(r"```[\s\S]*?```", "", text)
+        text = re.sub(r"`[^`\n]+`", "", text)
         return text
-    
+
     def remove_excessive_punctuation(self, text: str) -> str:
-        return re.sub(r'(?<=\w)[.,;:!?]+(?=\s|$)', '', text) #Trailing Punctuation
-    
+        return re.sub(r"(?<=\w)[.,;:!?]+(?=\s|$)", "", text)  # Trailing Punctuation
+
     def normalize_whitespace(self, text: str) -> str:
-        return re.sub(r'\s+', ' ', text).strip() #Excess whitespace
-    
+        return re.sub(r"\s+", " ", text).strip()  # Excess whitespace
+
     def remove_non_english_or_symbols(self, text: str) -> str:
-        return re.sub(r'[^\x00-\x7F]+', '', text) #Emojis
-    
+        return re.sub(r"[^\x00-\x7F]+", "", text)  # Emojis
+
     def full_text_cleaner(self, text: str) -> str:
         text = self.strip_rst_badges(text)
         text = self.remove_code_blocks(text)
@@ -415,16 +511,16 @@ class ReadmeCleaner:
         sm = SequenceMatcher(None, original, filtered)
         result = []
         for op, i1, i2, j1, j2 in sm.get_opcodes():
-            if op == 'equal':
+            if op == "equal":
                 result.append(original[i1:i2])
-            elif op == 'insert':
+            elif op == "insert":
                 result.append(f"<span style='color: #8dfc7e'>{filtered[j1:j2]}</span>")
-            elif op == 'delete':
+            elif op == "delete":
                 result.append(f"<span style='color: #fc7e7e'>{original[i1:i2]}</span>")
-            elif op == 'replace':
+            elif op == "replace":
                 result.append(f"<span style='color: #fc7e7e'>{original[i1:i2]}</span>")
                 result.append(f"<span style='color: #8dfc7e'>{filtered[j1:j2]}</span>")
-        return ''.join(result)
+        return "".join(result)
 
     def strip_url_manually(self, text: str) -> str:
         url_pattern = re.compile(
@@ -432,11 +528,10 @@ class ReadmeCleaner:
         )
         return url_pattern.sub("", text)
 
-
     def transform(self, text: str, visualise: bool = False) -> str | tuple[str, HTML]:
         soup = self.create_soup(text)
         soup = self.full_soup_cleaner(soup)
-        intermediate_text = soup.get_text('\n')
+        intermediate_text = soup.get_text("\n")
         intermediate_text = self.full_text_cleaner(intermediate_text)
         out_text = self.strip_url_manually(intermediate_text)
         if visualise:
@@ -444,102 +539,113 @@ class ReadmeCleaner:
             return out_text, HTML(visualised_html)
         else:
             return out_text
-        
+
+
 class RepositoryTextProcessor(TextProcessor):
     def __init__(self, readme_noise_section_pattern, **kwargs):
         super().__init__(**kwargs)
         self.readme_cleaner = ReadmeCleaner(noise_patterns=readme_noise_section_pattern)
-        
-        
-        
 
-def generate_v2_text(df_jobs, df_repos, noise_patterns, topic_kws, heuristic_kws):    
-    out_paths = [
-        DATA_DICT['embeddings']['v2']['jobs']
-    ]
+
+def generate_v2_text(df_jobs, df_repos, noise_patterns, topic_kws, heuristic_kws):
+    out_paths = [DATA_DICT["embeddings"]["v2"]["jobs"]]
     job_processor = JobTextProcessor(
-        heuristic_keywords=heuristic_kws,
-        topic_keywords=topic_kws
+        heuristic_keywords=heuristic_kws, topic_keywords=topic_kws
     )
     repo_processor = RepositoryTextProcessor(noise_patterns)
-    
-    job_texts = (
-        df_jobs['title'] + ' ' + 
-        df_jobs['description']
-    ).tolist()
-    
+
+    job_texts = (df_jobs["title"] + " " + df_jobs["description"]).tolist()
+
     repo_texts = (
-        df_repos['topics'].str.replace(',', ' ') + ' ' +
-        df_repos['owner'] + ' ' +
-        df_repos['repo'] + ' ' +
-        df_repos['description'].str.replace(r'[^\x00-\x7F]+', '', regex = True) + ' ' +
-        df_repos['readme'].apply(lambda x: repo_processor.readme_cleaner.transform(x))
-    ).str.strip().tolist()
-    
-    if not Path.exists(DATA_DICT['embeddings']['v2']['jobs']):
+        (
+            df_repos["topics"].str.replace(",", " ")
+            + " "
+            + df_repos["owner"]
+            + " "
+            + df_repos["repo"]
+            + " "
+            + df_repos["description"].str.replace(r"[^\x00-\x7F]+", "", regex=True)
+            + " "
+            + df_repos["readme"].apply(
+                lambda x: repo_processor.readme_cleaner.transform(x)
+            )
+        )
+        .str.strip()
+        .tolist()
+    )
+
+    if not Path.exists(DATA_DICT["embeddings"]["v2"]["jobs"]):
         jobs_out = job_processor.batch_transform(
             job_texts,
-            'BY_contains_topic_chunk',
-            'BY_contains_pos', 
-            pos = 'PROPN',
+            "BY_contains_topic_chunk",
+            "BY_contains_pos",
+            pos="PROPN",
         )
-        pd.DataFrame(data = jobs_out, columns = [f'jobs_texts']).to_csv(DATA_DICT['embeddings']['v2']['jobs'], index = False)
+        pd.DataFrame(data=jobs_out, columns=[f"jobs_texts"]).to_csv(
+            DATA_DICT["embeddings"]["v2"]["jobs"], index=False
+        )
     else:
-        print(f'EXIT (Already exists): {out_paths['jobs']}')
+        print(f"EXIT (Already exists): {out_paths['jobs']}")
 
-    if not Path.exists(DATA_DICT['embeddings']['v2']['repositories']):
+    if not Path.exists(DATA_DICT["embeddings"]["v2"]["repositories"]):
         repos_out = repo_processor.batch_transform(repo_texts)
-        pd.DataFrame(data = repos_out, columns = [f'repositories_texts']).to_csv(DATA_DICT['embeddings']['v2']['repositories'], index = False)
+        pd.DataFrame(data=repos_out, columns=[f"repositories_texts"]).to_csv(
+            DATA_DICT["embeddings"]["v2"]["repositories"], index=False
+        )
     else:
-        print(f'EXIT (Already exists): {out_paths['repositories']}')
+        print(f"EXIT (Already exists): {out_paths['repositories']}")
 
 
 # ---------------------------------------------------------------------------------
 # ------------------------------ ENTRY FUNCTION -----------------------------------
 # ---------------------------------------------------------------------------------
 
-    
-def generate_text_main(variant, df_jobs, df_repos, noise_patterns = None, topic_kws = None, heuristic_kws = None): 
+
+def generate_text_main(
+    variant, df_jobs, df_repos, noise_patterns=None, topic_kws=None, heuristic_kws=None
+):
     out_paths = {
-        'jobs': DATA_DICT['embeddings'][variant]['jobs_texts'],
-        'repositories': DATA_DICT['embeddings'][variant]['repositories_texts']
+        "jobs": DATA_DICT["embeddings"][variant]["jobs_texts"],
+        "repositories": DATA_DICT["embeddings"][variant]["repositories_texts"],
     }
-    print(f'GENERATING: {variant}')
-    if variant == 'v1':
+    print(f"GENERATING: {variant}")
+    if variant == "v1":
         generate_v1_text(out_paths, df_jobs, df_repos)
-    elif variant == 'v2':
-        generate_v2_text(out_paths, df_jobs, df_repos, noise_patterns, heuristic_kws, topic_kws)
+    elif variant == "v2":
+        generate_v2_text(
+            out_paths, df_jobs, df_repos, noise_patterns, heuristic_kws, topic_kws
+        )
+
 
 if __name__ == "__main__":
-    
     available_sentence_models = SENTENCE_MODEL.keys()
 
     parser = ArgumentParser()
-    
-    parser.add_argument(
-        '--text_variant',
-        default = None
-    )
-    parser.add_argument(
-        '--sentence_model_index',
-        default = None
-    )
-    
-    args = parser.parse_args()
-    
-    for arg, valid in zip([args.text_variant, args.sentence_model_index], [TEXT_VARIANTS, available_sentence_models]):
-        if arg is None:
-            raise ValueError(f'Must enter a value for text_variant - choose one from: {valid}')
-        elif arg not in valid:
-            raise ValueError(f'{arg} is not a valid value for text_variant - choose one from: {valid}')
 
-    df_jobs = pd.read_csv(DATA_DICT['jobs'])
-    df_repos = pd.read_csv(DATA_DICT['github']['repositories']['metadata'])
-    
-    
+    parser.add_argument("--text_variant", default=None)
+    parser.add_argument("--sentence_model_index", default=None)
+
+    args = parser.parse_args()
+
+    for arg, valid in zip(
+        [args.text_variant, args.sentence_model_index],
+        [TEXT_VARIANTS, available_sentence_models],
+    ):
+        if arg is None:
+            raise ValueError(
+                f"Must enter a value for text_variant - choose one from: {valid}"
+            )
+        elif arg not in valid:
+            raise ValueError(
+                f"{arg} is not a valid value for text_variant - choose one from: {valid}"
+            )
+
+    df_jobs = pd.read_csv(DATA_DICT["jobs"])
+    df_repos = pd.read_csv(DATA_DICT["github"]["repositories"]["metadata"])
+
     for df in [df_repos, df_jobs]:
         for c in df.columns:
-            df[c] = df[c].fillna('')
+            df[c] = df[c].fillna("")
 
     generate_text_main(
         args.text_variant,
@@ -547,10 +653,12 @@ if __name__ == "__main__":
         df_repos,
         noise_patterns=NOISY_SECTION_PATTERN,
         heuristic_kws=HEURISTIC_KWS,
-        topic_kws=TOPIC_KWS
+        topic_kws=TOPIC_KWS,
     )
-    
-    embedder = CreateEmbedding(sentence_model_index=args.sentence_model_index, text_variant=args.text_variant)
-    
-    embedder.generate_embeddings('jobs')
-    embedder.generate_embeddings('repositories')
+
+    embedder = CreateEmbedding(
+        sentence_model_index=args.sentence_model_index, text_variant=args.text_variant
+    )
+
+    embedder.generate_embeddings("jobs")
+    embedder.generate_embeddings("repositories")
