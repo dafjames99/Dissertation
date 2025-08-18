@@ -7,11 +7,11 @@ import pandas as pd
 from sklearn.metrics import average_precision_score, ndcg_score
 from tqdm import tqdm
 
-src_path = Path(__file__).resolve().parent.parent.parent
+src_path = Path(__file__).resolve().parent.parent
 sys.path.append(str(src_path))
 
 from utils.paths import DATA_DICT, EMBEDDING_DIR, EVAL_DIR  # noqa: E402
-from representation import SimilarityCalculator  # noqa: E402
+from models.embedding.compare_embeddings import SimilarityCalculator  # noqa: E402
 from models.weak.model import IntersectionFeatures  # noqa: E402
 
 

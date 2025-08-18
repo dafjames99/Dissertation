@@ -100,7 +100,6 @@ class DataLoader(UtilityClass):
             dr_dim,
         )
         self.job.embedding = np.load(jobs_embed_path)
-        # Ensure L2 normalization (especially important after dimensionality reduction)
         job_norms = np.linalg.norm(self.job.embedding, axis=1, keepdims=True)
         job_norms[job_norms == 0] = 1.0
         self.job.embedding = self.job.embedding / job_norms
@@ -121,7 +120,6 @@ class DataLoader(UtilityClass):
             dr_dim,
         )
         self.repo.embedding = np.load(repos_embed_path)
-        # Ensure L2 normalization (especially important after dimensionality reduction)
         repo_norms = np.linalg.norm(self.repo.embedding, axis=1, keepdims=True)
         repo_norms[repo_norms == 0] = 1.0
         self.repo.embedding = self.repo.embedding / repo_norms
@@ -129,8 +127,9 @@ class DataLoader(UtilityClass):
         self.stars = DotDict()
         self.stars.D = pd.read_parquet(DATA_DICT["github"]["star_wide"]["daily"])
         self.stars.M = pd.read_parquet(DATA_DICT["github"]["star_wide"]["monthly"])
-        self.stars.Q = pd.read_parquet(DATA_DICT["github"]["star_wide"]["monthly"])
-
+        self.stars.Q = pd.read_parquet(DATA_DICT["github"]["star_wide"]["quarterly"])
+        # for k, v in self.stars.items():
+        #     v.columns = pd.to_datetime(v.columns).dt.to_period(k).tolist()
 
 class SimilarityCalculator(UtilityClass):
     def __init__(
@@ -157,7 +156,19 @@ class SimilarityCalculator(UtilityClass):
         self.df = pd.DataFrame(
             self.matrix, columns=self.data.job.ids, index=self.data.repo.ids
         )
-
+        
+    @staticmethod
+    def from_model_name(model_name: str):
+        if model_name.find('_pca') != -1:
+            text_variant, sentence_model_index = model_name[:model_name.find('_pca')].split('_')
+            dr = 'pca'
+            dr_dim = int(model_name[model_name.find('_pca') + 4:])
+        else:
+            text_variant, sentence_model_index = model_name.split('_')
+            dr, dr_dim = None, None
+        return SimilarityCalculator(None, text_variant, sentence_model_index, dr, dr_dim)
+    
+    
     def describe(self, axis=0, **kwargs):
         """Returns a pd.describe() object of the desired axis (0 = By Repository, 1 = By Job)"""
         if axis == 0:
@@ -202,21 +213,103 @@ class SimilarityCalculator(UtilityClass):
         """
             )
         )
+        
+        
+    def squeeze_by_period(self, period="Q", agg=np.mean):
+        return self.df.T.groupby(
+            self.data.job.dates.dt.to_period(period)
+        ).agg(agg).T
 
+    def repo_stars_similarity(
+        self,
+        period: Literal["D", "M", "Q"],
+        agg_fn = np.mean, 
+        # drop_zero=False,
+        # add_cumulative=True,
+    ) -> pd.DataFrame:
+        """
+        Merge GitHub star counts and job similarity scores for a repository.
 
-# sim_v1 = SimilarityCalculator(
-#     text_variant='v1',
-#     sentence_model_index='b'
-# )
+        Parameters
+        ----------
+        repository : str
+            Full repository name in "owner/repo" format.
+        period : {"D", "M", "Q"}, default="Q"
+            Time period for grouping: daily, monthly, or quarterly.
+        method : callable, default=np.mean
+            Aggregation function for similarity scores (e.g., np.mean, np.sum).
+        drop_zero: bool, default=False
+            if True, drops rows where stars == 0 (heuristic for returning only after creation)
+            Useful for a simplified view - Might be misleading!
+        add_cumulative: bool, default=True
+            Choose whether to add a stars_cum (cumulative sum) column
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame with columns: [period, stars, <method>_similarity].
+        """
+        sim_df = self.squeeze_by_period(period, agg_fn).copy()
+        
+        star_ser = self.data.stars[period].copy()
+        star_ser.columns = pd.to_datetime(star_ser.columns).to_period(period).strftime('%YQ%q')
+        sim_df.columns = pd.to_datetime(sim_df.columns).to_period(period).strftime('%YQ%q')
+        cols = [c.strftime('%YQ%q') for c in star_ser.columns]
+        
+        tensor = np.zeros((2, self.df.shape[0], star_ser.shape[1])) #( sim/star, repos, jobs)
+        
+        
+        for i, df in enumerate([sim_df, star_ser]):
+            for j, repo in enumerate(star_ser.index):
+                for k, quarter in enumerate(cols):
+                    if df.iloc[j][quarter].isna():
+                        continue
+                    else:
+                        tensor[i, j, k] = df.loc[j, quarter]
+        
+        return ['sim', 'star'], ['repository'], ['quarter'], tensor
+        
+        # merged = star_df.merge(
+        #     sim_df,
+        #     how="outer",
+        #     left_on=star_df.index,
+        #     right_on=sim_df.index,
+        #     suffixes=("_stars", "_similarity"),
+        # )
+        # merged.rename(columns={"key_0": period}, inplace=True)
+        # if add_cumulative:
+        #     merged["stars_cum"] = merged["stars"].cumsum()
+        # merged["stars_norm"] = (merged["stars"] - merged["stars"].min()) / (
+        #     merged["stars"].max() - merged["stars"].min()
+        # )
 
-# sim_v2 = SimilarityCalculator(
-#     text_variant='v2',
-#     sentence_model_index='b'
-# )
-# i = 15000
-# sim_v1.demonstrate(i, 'highest')
-# sim_v2.demonstrate(i, 'highest')
+        # # Fill missing similarities with 0
+        # for method in methods:
+        #     merged[f"{method.__name__}_similarity"] = merged[
+        #         f"{method.__name__}_similarity"
+        #     ].fillna(0)
+        # if drop_zero:
+        #     return merged[merged["stars"] != 0]
+        # return merged
 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
 class EmbeddingSimilarity:
     def __init__(self, sentence_model_index, text_variant):

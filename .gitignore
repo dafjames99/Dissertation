@@ -6,6 +6,4 @@ __pycache__/
 !latex/report.pdf
 
 src/data/
-!src/data/embeddings/
-!src/data/weak_model/
 /Docs/*

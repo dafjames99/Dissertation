@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
-src_path = Path(__file__).resolve().parent.parent.parent
+src_path = Path(__file__).resolve().parent.parent
 sys.path.append(str(src_path))
 
 from utils.paths import EVAL_DIR  # noqa: E402

@@ -1,5 +1,4 @@
 import re
-from spellchecker import SpellChecker
 
 exact_titles = [
     "machine learning", "artificial intelligence", "ai",
@@ -40,7 +39,6 @@ title_map = {
     r'(.*big data.*developer.*|.*big data sdet.*|.*engineer.*big data.*)': "Big Data Developer",
     r'.*fullstack.*': 'Fullstack Developer',
     r'.*ai.* architect': 'AI Architect',
-    
 }
 
 def map_title_to_category(cleaned_title):

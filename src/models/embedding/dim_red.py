@@ -2,6 +2,11 @@ from sklearn.decomposition import PCA
 from pathlib import Path
 import argparse
 import numpy as np
+import sys
+
+src_path = Path(__file__).resolve().parent.parent
+sys.path.append(str(src_path))
+
 from utils.paths import DATA_DICT
 
 

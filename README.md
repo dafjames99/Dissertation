@@ -25,10 +25,3 @@ To-Do:
 2. Get Job Posting Data
 
 3. Using keywords, CREATE label dataset from job postings
-
-4. Fine-tune JobSpanBERT on labels
-
-5. Run inference on temporal samples
-
-6. Identify parallel trends in the Job-data skills / frameworks / terms as they relate to the github repositories.
-
