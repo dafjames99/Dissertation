@@ -251,18 +251,19 @@ class SimilarityCalculator(UtilityClass):
         sim_df = self.squeeze_by_period(period, agg_fn).copy()
         
         star_ser = self.data.stars[period].copy()
-        star_ser.columns = pd.to_datetime(star_ser.columns).to_period(period).strftime('%YQ%q')
-        sim_df.columns = pd.to_datetime(sim_df.columns).to_period(period).strftime('%YQ%q')
-        cols = [c.strftime('%YQ%q') for c in star_ser.columns]
+        star_ser.columns = pd.to_datetime(star_ser.columns).to_period(period)#.strftime('%YQ%q')
+        # sim_df.columns = sim_df.columns
+        # cols = [c.strftime('%YQ%q') for c in star_ser.columns]
         
         tensor = np.zeros((2, self.df.shape[0], star_ser.shape[1])) #( sim/star, repos, jobs)
         
-        
         for i, df in enumerate([sim_df, star_ser]):
             for j, repo in enumerate(star_ser.index):
-                for k, quarter in enumerate(cols):
-                    if df.iloc[j][quarter].isna():
+                for k, quarter in enumerate(star_ser.columns):
+                    if quarter not in df.columns:
                         continue
+                    # if df.iloc[j][quarter].isna():
+                    #     continue
                     else:
                         tensor[i, j, k] = df.loc[j, quarter]
         
