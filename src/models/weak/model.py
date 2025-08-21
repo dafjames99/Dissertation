@@ -47,6 +47,7 @@ def _compile_phrase_patterns(phrases: Iterable[str]) -> List[Tuple[str, re.Patte
 class WeakKeywordModel:
     def __init__(
         self,
+        text_variant: str,
         glossary_path: Optional[Path] = None,
         use_lemmatization: bool = False,
         use_fuzzy: bool = False,
@@ -56,7 +57,7 @@ class WeakKeywordModel:
         self.use_fuzzy = use_fuzzy
         self.fuzzy_threshold = fuzzy_threshold
         if glossary_path is None:
-            glossary_path = DATA_DICT["models"]["weak"]["kws"]
+            glossary_path = DATA_DICT["models"][f"weak_{text_variant}"]["kws"]
         self.glossary_path = glossary_path
         glossary_df = pd.read_csv(self.glossary_path)
         self._term_entries = _compile_phrase_patterns(
@@ -383,15 +384,16 @@ def get_kws_key(name, use_lemmatization: bool, use_fuzzy: bool) -> str:
         key += "_fuzzy"
     return key
 
-
 def ensure_keyword_matches(
-    name, text_col, use_lemmatization=False, use_fuzzy=False, fuzzy_threshold=90
+    text_variant, name, text_col, use_lemmatization=False, use_fuzzy=False, fuzzy_threshold=90
 ):
     kws_key = get_kws_key(name, use_lemmatization, use_fuzzy)
-    out_path = DATA_DICT["models"]["weak"][kws_key]
+    print(f"weak_{text_variant}", kws_key)
+    out_path = DATA_DICT["models"][f"weak_{text_variant}"][kws_key]
     if not out_path.exists():
-        inp = pd.read_csv(DATA_DICT["embeddings"]["v1"][f"{name}_texts"])
+        inp = pd.read_csv(DATA_DICT["embeddings"][text_variant][f"{name}_texts"])
         model = WeakKeywordModel(
+            text_variant = text_variant,
             use_lemmatization=use_lemmatization,
             use_fuzzy=use_fuzzy,
             fuzzy_threshold=fuzzy_threshold,
@@ -412,6 +414,11 @@ if __name__ == "__main__":
         help="Enable lemmatization for matching.",
     )
     parser.add_argument(
+        "--text_variant",
+        default=None,
+        help="Textual variant to consider",
+    )
+    parser.add_argument(
         "--use_fuzzy", action="store_true", help="Enable fuzzy matching."
     )
     parser.add_argument(
@@ -421,7 +428,8 @@ if __name__ == "__main__":
         help="Fuzzy match threshold (default: 90)",
     )
     args = parser.parse_args()
-
+    if args.text_variant is None:
+        print('Give an argument for --text_variant')
     jobs = pd.read_csv(DATA_DICT["jobs"])
     job_ids = jobs["job_id"]
 
@@ -431,16 +439,9 @@ if __name__ == "__main__":
     print(
         f"Example: Matching with lemmatization={args.use_lemmatization}, fuzzy={args.use_fuzzy}, threshold={args.fuzzy_threshold}"
     )
-    model = WeakKeywordModel(
-        use_lemmatization=args.use_lemmatization,
-        use_fuzzy=args.use_fuzzy,
-        fuzzy_threshold=args.fuzzy_threshold,
-    )
-    sample_text = "Developers working on neural networks and deep learnings algorithms."
-    print("Matches:", model._find_matches(sample_text))
-
     kws = {}
     kws["jobs"] = ensure_keyword_matches(
+        args.text_variant,
         "jobs",
         "jobs_texts",
         use_lemmatization=args.use_lemmatization,
@@ -448,6 +449,7 @@ if __name__ == "__main__":
         fuzzy_threshold=args.fuzzy_threshold,
     )
     kws["repositories"] = ensure_keyword_matches(
+        args.text_variant,
         "repositories",
         "repositories_texts",
         use_lemmatization=args.use_lemmatization,
@@ -467,4 +469,4 @@ if __name__ == "__main__":
     df_intersection = WeakKeywordModel.intersection_matrix(
         kws["jobs"], kws["repositories"], job_ids, repo_ids
     )
-    df_intersection.to_csv(DATA_DICT["models"]["weak"][intersection_key], index=False)
+    df_intersection.to_csv(DATA_DICT["models"][f"weak_{args.text_variant}"][intersection_key], index=False)

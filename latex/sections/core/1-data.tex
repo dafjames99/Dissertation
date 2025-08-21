@@ -1,0 +1,31 @@
+\chapter{Data Methods}
+
+\section{Collection}
+
+In the case of this project, there are two facets of required data:
+\begin{enumerate}
+  \item Open-Source Software Proliferation Data
+  \item Job Postings Data
+\end{enumerate}
+
+\subsection{Open-Source Software Data}
+Thankfully, the process of collecting data related to open-source software is fairly straightforward.
+As the name suggests, the OSS projects are intended to be \emph{open} and accessible.
+This necessitates the usage of some online platform for hosting and maintaining the codebase, with strong version-control systems to safeguard a maintainable codebase. \gh{} is functionally the default choice for hosting both open-source (and closed-source) codebases for a number of reasons, and is therefore the most relevant source for the required data of this project.
+
+This project seeks data that more or less speaks to how \emph{popular} a given \ghrepo{} is, and the prime candidate for this is the \emph{\gh{} Stars} mechanism. Users will "star" a \repo{} in the same manner that internet users "bookmark" a website, behaving as a shortcut. This is a grossly simplfied view of how \ghrepo{} are interacted with, however - most \ghrepo{} have no stars, and most users have "starred" very few \repos{} in return. The star is instead a useful proxy for measuring interest from a development point of view - if someone is contributing regularly to a \repo{}, they will star it. In this sense, stars are a useful measure of how a \repo{} is gaining interest from developers (and in a lesser sense, users), which in turn represents a growth in the utility the \repo{} represents.
+
+\cite{__GitHubDaily} is an open-source project that provides data on the historic star-counts of \ghrepo{}, marketed as a tool to "provide insights into a \repo{}'s trendiness". Within the ML/AI framework that I delineated, the relevant \repos{}' star counts were found and downloaded thusly.
+
+\subsection{Job Posting Data}
+As is generally true of commercially valuable data, it can prove difficult to find open data that properly satisfies the desired criteria. Generally, it is a relatively simple task to build legally compliant scrapers that programatically access and store the data from job boards online. However, finding stores of historical data presents a major challenge, because only \emph{active} job postings are present on job boards. This means that the scraper must be active throughout and is not useful for collecting data in retrospect.
+
+An alternative solution is to therefore find and access a pre-prepared dataset. This, unfortunately, proved challenging in the sense that:
+\begin{itemize}
+  \item Large, high-quality datasets are presented as products, and are thus expensive
+  \item Small, low-quality datasets often lack essential features, such as "job description" and even "date"
+\end{itemize}
+
+The solution to these problems was to utilize \emph{several} datasets that occupy different time-regions, made available on Kaggle. An overview of the characteristics for each dataset is included in the Appendix, as per Table~\ref{table:job_data_overview}.
+
+At this rate,

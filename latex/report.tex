@@ -1,0 +1,154 @@
+\documentclass{mscthesis}
+\usepackage[T1]{fontenc}  
+\usepackage[utf8]{inputenc} 
+\usepackage{longtable}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+
+\usepackage[style=ieee, backend=biber]{biblatex}
+\addbibresource{diss.bib}
+\usepackage{tabularx}
+% \usepackage{tabular}
+\usepackage{booktabs}     
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{subfigure}
+\usepackage[titletoc]{appendix}
+\usepackage{float}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{etoolbox}  % for conditional code
+\usepackage{tikz}
+% \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+\usepackage{makecell}
+\usepackage{amsmath}
+\usepackage{tikz-cd}
+\usepackage{subcaption}
+\usepackage{changepage}
+\usepackage{xcolor}
+
+\usepackage[acronym]{glossaries}
+
+\newacronym{oss}{OSS}{Open-Source Software}
+\newglossaryentry{jobposting}{name={job posting}, description={An advertisement describing employment opporunity/vacancy}}
+
+
+
+
+
+\definecolor{jobTeal}{HTML}{29D9F0  }
+\definecolor{githubPurple}{HTML}{6E5494}
+\definecolor{modelOrange}{HTML}{E67E22}
+\definecolor{evalYellow}{HTML}{FF2C00}
+\definecolor{outcomeGreen}{HTML}{46F029}
+\definecolor{auxGray}{HTML}{95A5A6}
+\newtcolorbox{prompt}[2][]{
+  colback=blue!5!white,
+  colframe=blue!75!black,
+  fontupper=\small\itshape,
+  title=Prompt: {#2},
+  breakable=false,
+  #1
+}
+\newcolumntype{Z}{ >{\centering\arraybackslash}X }
+% \newenvironment{prompt}
+%   {\begin{center}\begin{minipage}{0.95\linewidth}\itshape\small\color{blue}}
+%   {\end{minipage}\end{center}}
+\renewcommand\theadfont{\bfseries}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, matrix, decorations.pathreplacing, fit, backgrounds}
+\tikzset{
+  data/.style = {rectangle, draw, thick, minimum height=2em, minimum width=3cm, fill=green!10},
+  process/.style = {rectangle, draw, thick, minimum height=2em, minimum width=3.5cm, fill=orange!10},
+  decision/.style = {draw, thick, shape=diamond, shape aspect=2, fill=yellow!10, minimum width=3.5cm, minimum height=2em, align=center},
+  arrow/.style = {thick, ->, >=Stealth},
+}
+
+
+% in your preamble
+\newcommand{\jobpost}{Job Posting}
+\newcommand{\jobposts}{Job Postings}
+\newcommand{\ghrepo}{GitHub repository}
+\newcommand{\ghrepos}{GitHub repositories}
+\newcommand{\repo}{repository}
+\newcommand{\repos}{repositories}
+\newcommand{\gh}{GitHub}
+\newcommand{\LDF}{Labour Demand Forecasting}
+\newcommand{\ambigpair}{$(R_r, J_j)$}
+
+
+% \tcbset{
+%   colback=gray!5!white,
+%   colframe=black!75!white,
+%   fonttitle=\bfseries,
+%   boxrule=0.5pt,
+%   arc=2mm,
+%   left=2mm,
+%   right=2mm,
+%   top=1mm,
+%   bottom=1mm
+% }
+
+% \definecolor{assumptiongray}{rgb}{0.55,0.55,0.55}
+% \definecolor{hypothesispurple}{rgb}{0.5,0.2,0.6}
+% \definecolor{investigatedgreen}{rgb}{0.0,0.5,0.0}
+
+% \newlist{premiselist}{enumerate}{1}
+% \setlist[premiselist]{label=\textbf{P\arabic*}, left=2em, labelsep=0.5em, itemsep=0.4em}
+
+% \newcounter{assumpcounter}
+% \newcounter{hypocounter}
+% \newcounter{premisecounter}
+
+% \newcommand{\assumptionitem}{\refstepcounter{assumpcounter}\item[\textcolor{assumptiongray}{\textbf{A\theassumpcounter.}}]}
+% \newcommand{\hypothesisitem}{\refstepcounter{hypocounter}\item[\textcolor{hypothesispurple}{\textbf{H\thehypocounter.}}]}
+% \newcommand{\premiseitem}{\refstepcounter{premisecounter}\item[\textcolor{investigatedgreen}{\textbf{P\thepremisecounter.}}]}
+
+
+\input{envs/argument-environment}
+
+\pagenumbering{gobble}
+\title{From Code to Careers: Linking Open-Source Software Signals to AI Skill Demand in the Labour Market}
+\author{Dafydd James Thomas}
+\dept{Department of Computer Science}
+\supervisor{Dr Arina Buzdalova}
+\module{CHM9360}
+\degree{MSc Data Science}
+
+\begin{document}
+
+\setlength{\parindent}{10pt}\onehalfspacing\beforepreface
+
+\input{sections/abstract.tex}
+
+\input{sections/preface.tex}
+
+\clearpage\pagenumbering{arabic}
+
+\input{sections/introduction.tex}
+
+\input{sections/literature.tex}
+\input{sections/methodology.tex}
+% \input{sections/core/1-data.tex}
+% \input{sections/core/2-representation.tex}
+% \input{sections/core/3-similarity.tex}
+% \input{sections/core/4-timeseries.tex}
+% \input{sections/core/5-experimentation.tex}
+% \input{sections/core/6-discussion.tex}
+
+\input{sections/critical-evaluation.tex}
+
+\input{sections/conclusion.tex}
+
+\renewcommand{\bibname}{References}
+\printbibliography
+
+\input{sections/appendices.tex}
+\input{wordcount.tex}
+
+\input{wordcount_sections.tex}
+
+\end{document}

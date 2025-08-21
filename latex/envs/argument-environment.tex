@@ -1,0 +1,92 @@
+\definecolor{assumptiongray}{rgb}{0.55,0.55,0.55}
+\definecolor{hypothesispurple}{rgb}{0.5,0.2,0.6}
+\definecolor{investigatedgreen}{rgb}{0.0,0.5,0.0}
+\definecolor{argumentblue}{rgb}{0.0,0.3,0.6}
+\definecolor{conclusionred}{rgb}{0.7,0.1,0.1}
+
+% Global tcolorbox options
+\tcbset{
+  colback=gray!5!white,
+  colframe=black!75!white,
+  fonttitle=\bfseries,
+  breakable,
+  enhanced jigsaw,
+  boxrule=0.5pt,
+  arc=2mm,
+  left=2mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm
+}
+
+% Sub-boxes
+\newtcolorbox{assumptionbox}[1][]{title=Assumptions, colback=gray!5!white, colframe=assumptiongray, #1}
+\newtcolorbox{hypothesisbox}[1][]{title=Hypotheses, colback=gray!5!white, colframe=hypothesispurple, #1}
+\newtcolorbox{premisebox}[1][]{title=Theoretical Premises, colback=gray!5!white, colframe=investigatedgreen, #1}
+\newtcolorbox{conclusionbox}[1][]{title=Conclusions, colback=red!3!white, colframe=conclusionred, #1}
+
+% Master box: ArgumentBox
+\newtcolorbox{argumentbox}[1][]{title=Argument Structure, colback=blue!2!white, colframe=argumentblue, #1}
+
+% List styles
+\newlist{premiselist}{enumerate}{1}
+\setlist[premiselist]{left=1.5em, label=\textbf{P\arabic*}, itemsep=0.3em}
+
+\newlist{assumptionlist}{enumerate}{1}
+\setlist[assumptionlist]{left=1.5em, label=\textcolor{assumptiongray}{\textbf{A\arabic*}}, itemsep=0.3em}
+
+\newlist{hypothesislist}{enumerate}{1}
+\setlist[hypothesislist]{left=1.5em, label=\textcolor{hypothesispurple}{\textbf{H\arabic*}}, itemsep=0.3em}
+% Define conclusion list
+\newlist{conclusionlist}{enumerate}{1}
+\setlist[conclusionlist]{left=1.5em, label=\textcolor{conclusionred}{\textbf{C\arabic*}}, itemsep=0.3em}
+
+% Helper commands for inline use inside argumentbox
+\newcommand{\assumptions}[1]{
+  \begin{assumptionbox}
+  \begin{assumptionlist}
+  #1  
+  \end{assumptionlist}
+  \end{assumptionbox}
+}  
+
+\newcommand{\hypotheses}[1]{
+  \begin{hypothesisbox}
+  \begin{hypothesislist}
+  #1  
+  \end{hypothesislist}
+  \end{hypothesisbox}
+}  
+
+\newcommand{\premises}[1]{
+  \begin{premisebox}
+  \begin{premiselist}
+  #1  
+  \end{premiselist}
+  \end{premisebox}
+}  
+
+\newcommand{\conclusions}[1]{
+  \begin{conclusionbox}
+  \begin{conclusionlist}
+  #1  
+  \end{conclusionlist}
+  \end{conclusionbox}
+}  
+% Command for using conclusions inside argumentbox
+
+
+% Counter for argument boxes
+\newcounter{argumentbox}[section]
+% \renewcommand{\theargumentbox}{\arabic{argumentbox}}
+\renewcommand{\theargumentbox}{\thechapter.\arabic{argumentbox}}
+% \renewcommand{\theargumentbox}{\thesection.\arabic{argumentbox}}
+
+% Argument environment: allows numbering, label, and optional caption
+\NewDocumentEnvironment{argument}{O{} +b}{
+  \refstepcounter{argumentbox}
+  \begin{tcolorbox}[title=Argument~\theargumentbox:~#1, colback=gray!5!white, colframe=black!75!white, fonttitle=\bfseries]
+  #2
+  \end{tcolorbox}
+}{
+}

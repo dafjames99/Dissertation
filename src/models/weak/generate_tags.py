@@ -1437,4 +1437,5 @@ glossary = [
 ]
 if __name__ == "__main__":
     df_glossary = pd.DataFrame(glossary)
-    df_glossary.to_csv(DATA_DICT["models"]["weak"]["kws"], index=False)
+    df_glossary.to_csv(DATA_DICT["models"]["weak_v1"]["kws"], index=False)
+    df_glossary.to_csv(DATA_DICT["models"]["weak_v2"]["kws"], index=False)

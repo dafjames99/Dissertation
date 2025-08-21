@@ -1,9 +1,17 @@
 .vscode/
+
 venv/
+
 __pycache__/
 
-/latex/*
+latex/*
+latex/*/*.sty
+!latex/*.tex
+!latex/**/*/
+!latex/**/**/*.tex
+
 !latex/report.pdf
 
 src/data/
+
 /Docs/*

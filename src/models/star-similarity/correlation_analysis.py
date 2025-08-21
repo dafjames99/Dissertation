@@ -110,10 +110,6 @@ def compute_repo_metrics(index, star_values, similarity_values, sim_thresh=0.75,
 
 metrics_df = compute_repo_metrics(repos, star_values, similarity_values, sim_thresh=0.3, pop_thresh = 0.3, max_lag = 20)
 
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 plt.figure(figsize=(8,6))
 sns.scatterplot(
     data=metrics_df,

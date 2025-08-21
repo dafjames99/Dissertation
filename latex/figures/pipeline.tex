@@ -1,0 +1,117 @@
+\begin{figure}[ht]
+    \hskip-2cm
+    \begin{tikzpicture}[
+            >=Stealth,
+            /tikz/colsep/.initial=4cm,
+            /tikz/vertsep/.initial=15mm,
+            ghNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=githubPurple!70, anchor = south, text width=3cm, minimum height = 8mm, align=center, font=\small
+                },
+            jobNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=jobTeal!50, anchor = south, text width=3cm, minimum height = 8mm, align=center, font=\small
+                },
+            auxNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=auxGray!50, anchor = south, text width=3cm, minimum height = 8mm, align=center, font=\small
+                },
+            modelNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=modelOrange!50, text width=3cm, minimum height=10mm, align=center, font=\small
+                },
+            processNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=auxGray!50, text width=3cm, minimum height=10mm, align=center, font=\small
+                },
+            outcomeNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=outcomeGreen!50, text width=3cm, minimum height=10mm, align=center, font=\small
+                },
+            evalNode/.style={
+                    rectangle, draw=black!70, rounded corners,
+                    fill=evalYellow!50, text width=3cm, minimum height=10mm, align=center, font=\small
+                },
+            % arrow/.style={-Stealth, thick, black!70},
+            textArrow/.style={-Stealth, thick, black!70},
+            textArrowjobTeal/.style={-Stealth, thick, jobTeal!90},
+            textArrowPurple/.style={-Stealth, thick, githubPurple!90},
+            quantArrow/.style={-Stealth, thick, black!70, dashed},
+            quantArrowjobTeal/.style={-Stealth, thick, jobTeal!90, dashed},
+            quantArrowPurple/.style={-Stealth, thick, githubPurple!90, dashed},
+            quantArrowEval/.style={-Stealth, thick, evalYellow, dashed},
+            % pics/legend entry/.style={code={%   
+            %                 \draw[pic actions]
+            %                 (-0.5,0.25) sin (-0.25,0.4) cos (0,0.25) sin (0.25,0.1) cos (0.5,0.25);}}
+        ]
+
+        \pgfkeysgetvalue{/tikz/colsep}{\colsep}
+
+        \node[auxNode] (aux) at (-\colsep,0) {Auxiliary};
+        \node[jobNode] (job)  at (0,0) {Job Postings};
+        \node[ghNode] (github) at (\colsep,0) {GitHub Repositories};
+        \begin{pgfonlayer}{background}
+            \node[draw=black!20, dashed, rounded corners, thick, fill=auxGray!10, fit=(aux) (job) (github), inner sep=4mm]{};
+            \node[anchor=south west, font=\small, fill=white] at ([xshift=-15mm, yshift=10mm]aux.north west) {Data Sources};
+        \end{pgfonlayer}
+        \pgfkeysgetvalue{/tikz/vertsep}{\vsep}
+        \node[processNode, below=\vsep of $(github)!0.5!(job)$] (preproc) {Preprocessing};
+        \node[modelNode, below=\vsep of preproc] (embed) {Representation};
+        \node[modelNode] (weak) at (aux.center |- embed.center) {Weak Baseline};
+
+        \node[modelNode, below=\vsep of embed] (sim) {Similarity};
+        \node[evalNode, below=\vsep of weak] (eval) {Evaluation};
+        \node[outcomeNode, below=\vsep of sim] (ts) {Time-series};
+
+        \begin{pgfonlayer}{background}
+            \node[draw=black!20, dashed, rounded corners, thick, fill=auxGray!10, fit=(weak)(sim) (eval) (embed), inner sep=4mm]{};
+            \node[anchor=south west, font=\small, fill=white] at ([xshift=-15mm, yshift=5mm]weak.north west) {NLP Stages};
+        \end{pgfonlayer}
+        \draw[textArrowjobTeal] (job.south) -- ++(0,-\vsep/8) -| ([xshift=-2mm]preproc.north);
+        \draw[textArrowPurple] (github.south) -- ++(0,-\vsep/8) -| ([xshift=2mm]preproc.north);
+
+        \draw[quantArrowEval]
+        ([yshift=0.5mm]eval.north east)
+        -- ([xshift=-0.5mm]embed.south west)
+        -- ([xshift=-0.5mm]sim.north west)
+        -- ([xshift=0.5mm]eval.north east);
+
+        % .. controls ([xshift=-3mm, yshift=3mm]eval.north east) and ([xshift=3mm, yshift=3mm]embed.south west) .. (embed.south west)
+        % .. controls ([xshift=-3mm, yshift=3mm]embed.south west) and ([xshift=3mm, yshift=-3mm]sim.north west) .. (sim.north west)
+        % .. controls ([xshift=-3mm, yshift=3mm]sim.north west) and ([xshift=-3mm, yshift=3mm]eval.north east) .. (eval.north east);
+
+        \draw[textArrow] (aux.south) -- (weak.north);
+        % \draw[arrow] (aux.south) -- ++(0,-5mm) |- ++(\colsep/2,0) -- (weak.north);
+        \path[textArrowPurple] (github.north) edge [out=90,in=90,looseness=0.5] (aux.north);
+
+        \draw[textArrowjobTeal] ([xshift=-2mm]preproc.south) -- ([xshift=-2mm]embed.north);
+        \draw[textArrowPurple] ([xshift=2mm]preproc.south) -- ([xshift=2mm]embed.north);
+
+        \draw[quantArrowjobTeal] ([xshift=-2mm]embed.south) -- ([xshift=-2mm]sim.north);
+        \draw[quantArrowPurple] ([xshift=2mm]embed.south) -- ([xshift=2mm]sim.north);
+
+        \draw[quantArrow] ([xshift=-2mm]sim.south) -- ([xshift=-2mm]ts.north);
+        \draw[quantArrowPurple]
+        ([xshift=2mm]github.south)
+        -- ++(0,-\vsep*5.25)
+        node[pos = 0.5, right=0.3cm, rotate = 90]{Stars}
+        |- ++(-\colsep/2,0)
+        -- ([xshift=2mm]ts.north);
+
+        \draw[quantArrow] (weak.south) -- (eval.north);
+        \draw[quantArrow] (sim.west) --  (eval.east);
+        \matrix [draw, right=0.5*\colsep of embed, font=\tiny, column sep=5mm, row sep=2mm] {
+            \draw[-Stealth, thick, black!70] (-0.5,0) -- (0.5,0);                           & \node {\textbf{Textual} data flow}; \\
+            \draw[-Stealth, thick, black!70, dashed] (-0.5,0) -- (0.5,0);                   & \node {\textbf{Quantitative} data flow}; \\[3mm]
+            \node[circle, draw=jobTeal!70, fill=jobTeal!70, minimum size=4mm] {};           & \node {\textbf{Job-Postings} related};   \\
+            \node[circle, draw=githubPurple!70, fill=githubPurple!70, minimum size=4mm] {}; & \node {\textbf{GitHub} related};   \\
+            \node[circle, draw=modelOrange!70, fill=modelOrange!70, minimum size=4mm] {};   & \node {\textbf{Model/representation}};           \\
+            \node[circle, draw=evalYellow!70, fill=evalYellow!70, minimum size=4mm] {};     & \node {\textbf{Evaluation}};           \\
+            \node[circle, draw=outcomeGreen!70, fill=outcomeGreen!70, minimum size=4mm] {}; & \node {\textbf{Outcome}};           \\
+            \node[circle, draw=auxGray!70, fill=auxGray!70, minimum size=4mm] {};           & \node {\textbf{Other Process}};           \\
+        };
+
+    \end{tikzpicture}
+    \caption{Conceptual diagram of methodology pipeline.}
+    \label{fig:pipeline}
+\end{figure}

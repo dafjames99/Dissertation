@@ -1,0 +1,36 @@
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\small},
+  vec/.style={draw, rectangle, minimum height=0.8cm, minimum width=2.8cm},
+  blob/.style={draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=gray!10},
+  arrow/.style={-Latex, thick},
+  matrixbox/.style={draw, fill=blue!5, minimum width=2.5cm, minimum height=2.5cm},
+  timeseries/.style={draw, rounded corners, fill=orange!10, minimum width=3cm, minimum height=1.8cm},
+  dot/.style={circle, fill=black, inner sep=1pt}
+  ]
+
+% Embedding vectors (horizontally aligned with ellipsis)
+\node[vec, label=below:{\textbf{Repo Embedding}}] (repo) {\( \left[0.1, \dots, 0.9\right] \)};
+\node[vec, right=3.5cm of repo, label=below:{\textbf{Job Embedding}}] (job) {\( \left[0.2, \dots, 0.8\right] \)};
+
+% Similarity matrix (to the right of embeddings)
+\node[matrixbox, right=3.5cm of job, label=below:{\textbf{Similarity Matrix}}] (sim) {};
+
+% Arrows from embeddings to matrix
+\draw[arrow] (repo.east) -- ([xshift=-0.5cm]sim.west);
+\draw[arrow] (job.east) -- ([xshift=0.5cm]sim.west);
+
+% Mini time series chart (to the right of matrix)
+\node[timeseries, right=3.5cm of sim, align=center] (ts) {Stargazers vs\\ Job Mentions};
+
+\draw[arrow] (sim.east) -- (ts.west);
+
+% Decoration: similarity interaction path
+\node[dot] at ($(sim.north west)!0.5!(sim.north east)$) {};
+\node[dot] at ($(sim.south west)!0.5!(sim.south east)$) {};
+
+\end{tikzpicture}
+\caption{Architecture overview: vector embeddings with ellipses, similarity matrix, and temporal interactions (left to right).}
+\end{figure}

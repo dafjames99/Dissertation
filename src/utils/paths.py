@@ -96,17 +96,34 @@ class KeywordDict(TypedDict):
     stackoverflow: Path
 
 
+class WeakDict(TypedDict):
+    kws: Path
+    jobs: Path
+    jobs_lemmatize: Path
+    jobs_fuzzy: Path
+    jobs_lemmatize_fuzzy: Path
+    repositories: Path
+    repositories_lemmatize: Path
+    repositories_fuzzy: Path
+    repositories_lemmatize_fuzzy: Path
+    intersection: Path
+    intersection_lemmatize: Path
+    intersection_fuzzy: Path
+    intersection_lemmatize_fuzzy: Path
+
+
 class ModelDict(TypedDict):
-    bertopic: Path
-    weak: dict
-
-
+    weak_v1: WeakDict
+    weak_v2: WeakDict
+    
+    
 class ConfigDict(TypedDict):
     text_embed_variants: Path
 
 
 class DataDict(TypedDict):
     models: ModelDict
+    # models: dict
     keywords: KeywordDict
     gql: GQLDict
     github: GitHubDict
@@ -118,7 +135,7 @@ class DataDict(TypedDict):
 
 
 # Resolve paths relative to project root for robustness across working directories
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = REPO_ROOT / "src"
 
 GQL_DIR = SRC_DIR / "graphql"
@@ -218,37 +235,37 @@ DATA_DICT: DataDict = {
         },
     },
     "models": {
-        "weak": {
+        "weak_v1": {
             # Keyword glossary (input)
             "kws": TAGS_DIR / "keyword_category_glossary.csv",
             # Output files for jobs
-            "jobs": DATA_PATH / "weak_model" / "jobs_weak_count.csv",
+            "jobs": DATA_PATH / "weak_model_v1" / "jobs_weak_count.csv",
             "jobs_lemmatize": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "jobs_weak_count_lemmatize.csv",
-            "jobs_fuzzy": DATA_PATH / "weak_model" / "jobs_weak_count_fuzzy.csv",
+            "jobs_fuzzy": DATA_PATH / "weak_model_v1" / "jobs_weak_count_fuzzy.csv",
             "jobs_lemmatize_fuzzy": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "jobs_weak_count_lemmatize_fuzzy.csv",
             # Output files for repositories
-            "repositories": DATA_PATH / "weak_model" / "repositories_weak_count.csv",
+            "repositories": DATA_PATH / "weak_model_v1" / "repositories_weak_count.csv",
             "repositories_lemmatize": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "repositories_weak_count_lemmatize.csv",
             "repositories_fuzzy": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "repositories_weak_count_fuzzy.csv",
             "repositories_lemmatize_fuzzy": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "repositories_weak_count_lemmatize_fuzzy.csv",
             # Output files for intersection
-            "intersection": DATA_PATH / "weak_model" / "intersection.csv",
+            "intersection": DATA_PATH / "weak_model_v1" / "intersection.csv",
             "intersection_lemmatize": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "intersection_lemmatize.csv",
-            "intersection_fuzzy": DATA_PATH / "weak_model" / "intersection_fuzzy.csv",
+            "intersection_fuzzy": DATA_PATH / "weak_model_v1" / "intersection_fuzzy.csv",
             "intersection_lemmatize_fuzzy": DATA_PATH
-            / "weak_model"
+            / "weak_model_v1"
             / "intersection_lemmatize_fuzzy.csv",
             # Evaluation summary output
             # "evaluation": {
@@ -292,7 +309,82 @@ DATA_DICT: DataDict = {
             # "v2_c_pca256_per_category": EVAL_DIR
             # / "eval_v2_c_pca256_per_category.csv",
             # },
-        }
+        },
+        "weak_v2": {
+            # Keyword glossary (input)
+            "kws": TAGS_DIR / "keyword_category_glossary.csv",
+            # Output files for jobs
+            "jobs": DATA_PATH / "weak_model_v2" / "jobs_weak_count.csv",
+            "jobs_lemmatize": DATA_PATH
+            / "weak_model_v2"
+            / "jobs_weak_count_lemmatize.csv",
+            "jobs_fuzzy": DATA_PATH / "weak_model_v2" / "jobs_weak_count_fuzzy.csv",
+            "jobs_lemmatize_fuzzy": DATA_PATH
+            / "weak_model_v2"
+            / "jobs_weak_count_lemmatize_fuzzy.csv",
+            # Output files for repositories
+            "repositories": DATA_PATH / "weak_model_v2" / "repositories_weak_count.csv",
+            "repositories_lemmatize": DATA_PATH
+            / "weak_model_v2"
+            / "repositories_weak_count_lemmatize.csv",
+            "repositories_fuzzy": DATA_PATH
+            / "weak_model_v2"
+            / "repositories_weak_count_fuzzy.csv",
+            "repositories_lemmatize_fuzzy": DATA_PATH
+            / "weak_model_v2"
+            / "repositories_weak_count_lemmatize_fuzzy.csv",
+            # Output files for intersection
+            "intersection": DATA_PATH / "weak_model_v2" / "intersection.csv",
+            "intersection_lemmatize": DATA_PATH
+            / "weak_model_v2"
+            / "intersection_lemmatize.csv",
+            "intersection_fuzzy": DATA_PATH / "weak_model_v2" / "intersection_fuzzy.csv",
+            "intersection_lemmatize_fuzzy": DATA_PATH
+            / "weak_model_v2"
+            / "intersection_lemmatize_fuzzy.csv",
+            # Evaluation summary output
+            # "evaluation": {
+            # "v1_a_run": EVAL_DIR / "eval_v1_a_run.csv",
+            # "v1_b_run": EVAL_DIR / "eval_v1_b_run.csv",
+            # "v1_c_run": EVAL_DIR / "eval_v1_c_run.csv",
+            # "v2_a_run": EVAL_DIR / "eval_v2_a_run.csv",
+            # "v2_b_run": EVAL_DIR / "eval_v2_b_run.csv",
+            # "v2_c_run": EVAL_DIR / "eval_v2_c_run.csv",
+            # "v1_b_pca64_run": EVAL_DIR / "eval_v1_b_pca64_run.csv",
+            # "v1_b_pca128_run": EVAL_DIR / "eval_v1_b_pca128_run.csv",
+            # "v1_b_pca256_run": EVAL_DIR / "eval_v1_b_pca256_run.csv",
+            # "v2_b_pca64_run": EVAL_DIR / "eval_v2_b_pca64_run.csv",
+            # "v2_b_pca128_run": EVAL_DIR / "eval_v2_b_pca128_run.csv",
+            # "v2_b_pca256_run": EVAL_DIR / "eval_v2_b_pca256_run.csv",
+            # "v2_c_pca64_run": EVAL_DIR / "eval_v2_c_pca64_run.csv",
+            # "v2_c_pca128_run": EVAL_DIR / "eval_v2_c_pca128_run.csv",
+            # "v2_c_pca256_run": EVAL_DIR / "eval_v2_c_pca256_run.csv",
+            # "v1_a_per_category": EVAL_DIR / "eval_v1_a_per_category.csv",
+            # "v1_b_per_category": EVAL_DIR / "eval_v1_b_per_category.csv",
+            # "v1_c_per_category": EVAL_DIR / "eval_v1_c_per_category.csv",
+            # "v2_a_per_category": EVAL_DIR / "eval_v2_a_per_category.csv",
+            # "v2_b_per_category": EVAL_DIR / "eval_v2_b_per_category.csv",
+            # "v2_c_per_category": EVAL_DIR / "eval_v2_c_per_category.csv",
+            # "v1_b_pca64_per_category": EVAL_DIR
+            # / "eval_v1_b_pca64_per_category.csv",
+            # "v1_b_pca128_per_category": EVAL_DIR
+            # / "eval_v1_b_pca128_per_category.csv",
+            # "v1_b_pca256_per_category": EVAL_DIR
+            # / "eval_v1_b_pca256_per_category.csv",
+            # "v2_b_pca64_per_category": EVAL_DIR
+            # / "eval_v2_b_pca64_per_category.csv",
+            # "v2_b_pca128_per_category": EVAL_DIR
+            # / "eval_v2_b_pca128_per_category.csv",
+            # "v2_b_pca256_per_category": EVAL_DIR
+            # / "eval_v2_b_pca256_per_category.csv",
+            # "v2_c_pca64_per_category": EVAL_DIR
+            # / "eval_v2_c_pca64_per_category.csv",
+            # "v2_c_pca128_per_category": EVAL_DIR
+            # / "eval_v2_c_pca128_per_category.csv",
+            # "v2_c_pca256_per_category": EVAL_DIR
+            # / "eval_v2_c_pca256_per_category.csv",
+            # },
+        },
     },
     "ner_train": PROCESSED_DIR / "ner_training_data.jsonl",
     "embeddings": {
