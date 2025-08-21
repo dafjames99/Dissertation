@@ -1,0 +1,11 @@
+# Figures 
+
+- [ ]
+
+# Tables
+
+- [ ]
+
+# Math / Equations
+
+- [ ]

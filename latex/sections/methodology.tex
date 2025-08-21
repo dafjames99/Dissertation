@@ -93,7 +93,8 @@ Each of these data sets satisfy the minimal criteria for utility in this project
 
 These five datasets cover different temporal (See Fig~\ref{fig:job-data-time-variation}), regional and occupational (See Fig~\ref{fig:job-data-title-variations}) ranges.
 This next stage involved reconfiguring their composition into a single representative dataset.
-
+\input{figures/job-data-time-variation.tex}
+\input{figures/job-data-title-variation.tex}
 As is the case for the majority of this project, this process was undertaken using \texttt{Python} (and the library \texttt{Pandas} - full information on utilized software \& libraries is under Appendix~\ref{appendix:software-libaries}).
 Some datasets included an additional ``Skills'' field.
 During pre-processing, I concatenated this to the ``Description'' field so that all \jobposts{} are represented as a single textual body.
@@ -195,7 +196,6 @@ In this case, the problem lies with labels - there are none. It is therefore nec
 The chosen method follows, broadly, fuzzy matching a dictionary of hand-crafted keywords.
 
 \subsection{Keyword Dictionary Design}
-
 
 
 \begin{itemize}
