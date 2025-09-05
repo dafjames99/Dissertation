@@ -113,6 +113,7 @@ class WeakDict(TypedDict):
 
 
 class ModelDict(TypedDict):
+    test_dir: Path
     weak_v1: WeakDict
     weak_v2: WeakDict
     
@@ -235,6 +236,8 @@ DATA_DICT: DataDict = {
         },
     },
     "models": {
+        'star_eval': EVAL_DIR / 'star_similarity_correlation_analysis.csv',
+        'test_dir': EVAL_DIR / 'test_eval',
         "weak_v1": {
             # Keyword glossary (input)
             "kws": TAGS_DIR / "keyword_category_glossary.csv",

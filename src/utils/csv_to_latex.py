@@ -1,3 +1,4 @@
+import numpy as np
 import argparse
 import pandas as pd
 
@@ -9,12 +10,17 @@ def df_to_latex_subtables(df, index_col, cols_per_table=5, caption="Results Tabl
     """
     # Make a copy so we don’t overwrite original
     df = df.copy()
-
+    # for col in df.columns:
+    #     try:
+    #         df[col] = df[col].apply(lambda x: np.round(x, 3))
+    #     except:
+    #         pass
+        
     # Bold max per column
     def make_bold_max(col):
         if pd.api.types.is_numeric_dtype(col):
             max_val = col.max()
-            return lambda x: f"\\textbf{{{x:.4f}}}" if x == max_val else f"{x:.4f}"
+            return lambda x: f"\\textbf{{{'{0:.3f}'.format(x)}}}" if x == max_val else f"{x:.3f}"
         else:
             return None  # escape=True will handle text
     
@@ -33,7 +39,9 @@ def df_to_latex_subtables(df, index_col, cols_per_table=5, caption="Results Tabl
         index_col = df.index.name or "Index"
     all_columns = df.columns.tolist()
     all_columns.remove(index_col)
-    col_chunks = [[index_col] + all_columns[i:i+cols_per_table] for i in range(1, len(all_columns), cols_per_table)]
+    print(all_columns)
+    col_chunks = [[index_col] + all_columns[i:i+cols_per_table] for i in range(0, len(all_columns), cols_per_table)]
+    print(col_chunks)
     num_subtables = len(col_chunks)
     subtable_width = (0.95 / num_subtables)  # leave a little margin
 

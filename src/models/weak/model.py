@@ -59,9 +59,9 @@ class WeakKeywordModel:
         if glossary_path is None:
             glossary_path = DATA_DICT["models"][f"weak_{text_variant}"]["kws"]
         self.glossary_path = glossary_path
-        glossary_df = pd.read_csv(self.glossary_path)
+        self.glossary_df = pd.read_csv(self.glossary_path)
         self._term_entries = _compile_phrase_patterns(
-            glossary_df["Term"]
+            self.glossary_df["Term"]
             .dropna()
             .astype(str)
             .map(str.strip)
@@ -69,7 +69,7 @@ class WeakKeywordModel:
             .unique()
         )
         self._acronym_entries = _compile_phrase_patterns(
-            glossary_df["Acronym"]
+            self.glossary_df["Acronym"]
             .dropna()
             .astype(str)
             .map(str.strip)
@@ -172,6 +172,7 @@ class WeakKeywordModel:
 
     @staticmethod
     def intersection_matrix(
+        text_variant: str,
         df1: pd.DataFrame,
         df2: pd.DataFrame,
         row_ids1,
@@ -184,6 +185,13 @@ class WeakKeywordModel:
         """
 
         # Build lookup: id -> set of (match, match_type)
+        wkm = WeakKeywordModel(text_variant)
+        glossary = wkm.glossary_df
+        acronym_map = (
+            glossary.dropna(subset=["Acronym"])
+            .set_index("Acronym")["Term"]
+            .to_dict()
+        )
         def build_lookup(df):
             return {
                 row_id: set(zip(grp["match"], grp["match_type"]))
@@ -205,8 +213,20 @@ class WeakKeywordModel:
                 row_iter = tqdm(row_ids2, desc="Rows", leave=False)
             for r in row_iter:
                 set2 = lookup2.get(r, set())
-                intersection = list([list(x) for x in (set1 & set2)])
-                out_col[r] = intersection
+                intersection = set1 & set2
+                
+                for m1, t1 in set1:
+                    if t1 == "acronym" and m1 in acronym_map:
+                        term = acronym_map[m1]
+                        if (term, "term") in set2:
+                            intersection.add((term, "term"))
+                    if t1 == "term":
+                        for acr, acr_term in acronym_map.items():
+                            if acr_term == m1 and (acr, "acronym") in set2:
+                                intersection.add((m1, "term"))
+                out_col[r] = [list(x) for x in intersection]
+                # intersection = list([list(x) for x in (set1 & set2)])
+                # out_col[r] = intersection
             out[c] = out_col
         return pd.DataFrame(out)
 
@@ -263,7 +283,7 @@ class WeakKeywordModel:
 class IntersectionFeatures:
     def __init__(self, path: Optional[Path] = None):
         if path is None:
-            path = DATA_DICT["models"]["weak"]["intersection"]
+            path = DATA_DICT["models"]["weak_v1"]["intersection_lemmatize_fuzzy"]
         # Load the intersection matrix, parsing list-like strings
         self.df = pd.read_csv(
             path,
@@ -274,7 +294,7 @@ class IntersectionFeatures:
         # Load glossary and build lookup maps from term/acronym to categories
         try:
             glossary = pd.read_csv(
-                DATA_DICT["models"]["weak"]["kws"]
+                DATA_DICT["models"]["weak_v1"]["kws"]
             )  # Term, Acronym, Category
         except Exception:
             glossary = pd.DataFrame(columns=["Term", "Acronym", "Category"])  # fallback
@@ -467,6 +487,6 @@ if __name__ == "__main__":
 
     print("Generating intersection ...")
     df_intersection = WeakKeywordModel.intersection_matrix(
-        kws["jobs"], kws["repositories"], job_ids, repo_ids
+        args.text_variant, kws["jobs"], kws["repositories"], job_ids, repo_ids
     )
     df_intersection.to_csv(DATA_DICT["models"][f"weak_{args.text_variant}"][intersection_key], index=False)

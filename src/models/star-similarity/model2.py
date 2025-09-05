@@ -20,11 +20,11 @@ from utils.plots import n_colors
 from utils.paths import DATA_DICT, SENTENCE_MODEL
 from models.embedding.compare_embeddings import SimilarityCalculator, UtilityClass, EmbeddingSimilarity
 
-OPTIMAL_MODEL = 'v2_b_pca128'
+OPTIMAL_MODEL = 'v2_c'
 model = SimilarityCalculator.from_model_name(OPTIMAL_MODEL)
 
 
-EmbeddingSimilarity.repo_stars_similarity()
+# EmbeddingSimilarity.repo_stars_similarity()
 
 
 

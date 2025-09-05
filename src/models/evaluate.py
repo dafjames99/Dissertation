@@ -1,3 +1,4 @@
+import argparse
 import sys
 from pathlib import Path
 from datetime import datetime, timezone as tz
@@ -16,9 +17,10 @@ from models.weak.model import IntersectionFeatures  # noqa: E402
 
 
 # ---------------------------- Labels (built once) ----------------------------
-kws = pd.read_csv(DATA_DICT["models"]["weak"]["kws"])
+kws = pd.read_csv(DATA_DICT["models"]["weak_v1"]["kws"])
 kws["Category"] = kws["Category"].astype(str).str.strip()
-intersect = IntersectionFeatures()
+
+intersect = IntersectionFeatures(DATA_DICT['models']['weak_v1']['intersection_lemmatize_fuzzy']) #I matrix where I[i, j] = [(term, match_type), ...]
 
 repos = intersect.df.index.tolist()  # R repos (ids)
 jobs = intersect.df.columns.astype(int).tolist()  # J jobs (ids)
@@ -30,7 +32,10 @@ job_idx = {j: i for i, j in enumerate(jobs)}
 cat_idx = {c: i for i, c in enumerate(categories)}
 
 
-def _build_matches(intersect):
+def _build_matches(intersect): 
+    """
+    takes I and returns I with [{match: ..., match_type: ..., category: ...}, ....] lists as entries
+    """
     matches = {}
     for i, row in enumerate(intersect.df.itertuples(index=False, name=None)):
         for j, cell in enumerate(row):
@@ -60,10 +65,10 @@ for (r, j), match_list in matches.items():
         if not ks:
             continue
         for k in ks:
-            C[i, jj, k] += 1
+            C[i, jj, k] += 1 #Count tensor
             seen_per_cat.add(k)
     for k in seen_per_cat:
-        B[i, jj, k] = 1
+        B[i, jj, k] = 1 # Binary Tensor
 
 
 # ---------------------------- Evaluation helpers ----------------------------
@@ -72,10 +77,10 @@ def eval_category(k, S, B, topk=(1, 5, 10)):
     p_at_k = {k_: [] for k_ in topk}
     prevalence_jobs = 0
     for jj in range(S.shape[1]):
-        y_true = B[:, jj, k]
+        y_true = B[:, jj, k] # Binary values for each repo for that job & category
         if y_true.sum() == 0:
             continue
-        y_scores = S[:, jj]
+        y_scores = S[:, jj] # similarity values per repo for that job
         APs.append(average_precision_score(y_true, y_scores))
         ndcgs.append(ndcg_score([y_true], [y_scores], k=10))
         order = np.argsort(-y_scores)
@@ -85,8 +90,8 @@ def eval_category(k, S, B, topk=(1, 5, 10)):
         prevalence_jobs += 1
 
     return {
-        "AP_mean": float(np.mean(APs)) if APs else np.nan,
-        "NDCG_mean": float(np.mean(ndcgs)) if ndcgs else np.nan,
+        "AP_mean": float(np.mean(APs)) if APs else np.nan, #Average of (Average-precision across repos) across jobs for that category
+        "NDCG_mean": float(np.mean(ndcgs)) if ndcgs else np.nan, #Average of (NDCG@10 across repos) across jobs for that category
         "P@k_mean": {
             kk: (float(np.mean(v)) if v else np.nan) for kk, v in p_at_k.items()
         },
@@ -136,7 +141,7 @@ def evaluate_run(S, B):
     micro_p_at_k = {k_: [] for k_ in topk_micro}
     jobs_evaluated_micro = 0
     for jj in range(S.shape[1]):
-        y_true_any = (B[:, jj, :].sum(axis=1) > 0).astype(int)
+        y_true_any = (B[:, jj, :].sum(axis=1) > 0).astype(int) # Count of true categories per repo for
         if y_true_any.sum() == 0:
             continue
         y_scores = S[:, jj]
@@ -220,11 +225,15 @@ def discover_configs() -> list[tuple[str, str, str | None, int | None]]:
 
 
 # ---------------------------- Main loop ----------------------------
-def main():
+def main(path: Path = None):
     # destination directory (agnostic to keyed mapping)
-    eval_dir = EVAL_DIR
-    eval_dir.mkdir(parents=True, exist_ok=True)
-
+    if path is None:
+        eval_dir = EVAL_DIR
+        eval_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        eval_dir = path
+        eval_dir.mkdir(parents = True, exist_ok = True)
+    
     run_rows = []
     per_cat_rows = []
 
@@ -317,4 +326,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--test',
+        action = 'store_true',
+        default = False
+    )
+    args = parser.parse_args()
+    path = None
+    if args.test:
+        path = DATA_DICT['models']['test_dir']
+    main(path = path)
