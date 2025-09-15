@@ -7,9 +7,7 @@ sys.path.append(str(src_path))
 
 from utils.paths import DATA_DICT
 
-# Define the glossary as a list of dictionaries
 glossary = [
-    # Programming Languages, Database Languages, Data Frameworks, Analytics Tech
     {
         "Term": "Python",
         "Acronym": None,
@@ -1435,6 +1433,7 @@ glossary = [
         "Category": "Data & Preprocessing",
     },
 ]
+
 if __name__ == "__main__":
     df_glossary = pd.DataFrame(glossary)
     df_glossary.to_csv(DATA_DICT["models"]["weak_v1"]["kws"], index=False)

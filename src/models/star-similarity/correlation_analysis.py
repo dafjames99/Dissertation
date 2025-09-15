@@ -11,8 +11,11 @@ sys.path.append(str(src_path))
 
 from utils.paths import DATA_DICT
 from models.embedding.compare_embeddings import SimilarityCalculator
+
 fig_dir = 'latex/figures'
+
 OPTIMAL_MODEL = 'v2_c'
+
 model = SimilarityCalculator.from_model_name(OPTIMAL_MODEL)
 
 sim_df = model.squeeze_by_period('Q')
@@ -144,15 +147,13 @@ def compute_repo_metrics(index, star_values, similarity_values, sim_thresh=0.75,
 
     return pd.DataFrame(metrics_list, index = index)
 
-
 metrics_df = compute_repo_metrics(repos, star_values, similarity_values, sim_thresh=0.3, pop_thresh = 0.3, max_lag = 50, frac_at_mean=True)
 metrics_df.to_csv(DATA_DICT['models']['star_eval'])
 
 plt.figure(figsize=(10,6))
 sns.histplot(metrics_df['repo_age'].dropna(), bins=20, kde=True, color='skyblue')
 plt.xlabel("Repository Age (in Quarters)")
-# plt.title("Distribution of Repository-Ages")
-plt.savefig(fig_dir + '/repo-ages.png')
+#plt.savefig(fig_dir + '/repo-ages.png')
 
 data_list = []
 for i, repo_name in enumerate(repos):
@@ -192,10 +193,8 @@ for i in range(0, n_repos, chunk_size):
     plt.ylabel("Repository")
     plt.title(f"Similarity Distributions per Repository (Repos {i+1}–{i+len(chunk)})")
     plt.tight_layout()
-    plt.savefig(fig_dir + f'/sim-boxplot_{i//chunk_size + 1}.png', dpi=300)
+    #plt.savefig(fig_dir + f'/sim-boxplot_{i//chunk_size + 1}.png', dpi=300)
     plt.close()
-
-
 
 plt.figure(figsize=(10,6))
 sns.scatterplot(
@@ -210,7 +209,7 @@ sns.scatterplot(
 plt.xlabel("Mean Popularity")
 plt.ylabel("Mean Similarity")
 plt.title("Mean Similarity & Popularity")
-plt.savefig(fig_dir + '/mean-sim-pop.png')
+#plt.savefig(fig_dir + '/mean-sim-pop.png')
 # plt.show()
 
 
@@ -230,7 +229,7 @@ plt.xlabel("Best Lag (quarters)")
 plt.ylabel("Max Correlation")
 plt.title("Lags with Best Correlation")
 plt.legend(title = 'Repository Age \n(in Quarters)',loc = 'lower right')
-plt.savefig(fig_dir + '/lag-max_corr.png')
+#plt.savefig(fig_dir + '/lag-max_corr.png')
 # plt.show()
 
 
@@ -238,14 +237,14 @@ plt.figure(figsize=(7,5))
 sns.histplot(metrics_df['pearson_corr'].dropna(), bins=20, kde=True, color='skyblue')
 plt.xlabel("Pearson Correlation")
 plt.title("Correlation: Sim vs Pop")
-plt.savefig(fig_dir + '/dist-corrs.png')
+#plt.savefig(fig_dir + '/dist-corrs.png')
 # plt.show()
 
 plt.figure(figsize=(7,5))
 sns.histplot(metrics_df['max_corr'].dropna(), bins=20, kde=True, color='skyblue')
 plt.xlabel("Max Correlation")
 plt.title("Correlation: Sim vs Pop \n(at best respective best lags)")
-plt.savefig(fig_dir + '/dist-max-corr.png')
+#plt.savefig(fig_dir + '/dist-max-corr.png')
 # plt.show()
 
 plt.figure(figsize=(10,6))
@@ -261,7 +260,7 @@ sns.scatterplot(
 plt.xlabel("Max Correlation")
 plt.ylabel("Fraction of High Alignment & Popularity")
 plt.title("Repos with High Popularity & Alignment")
-plt.savefig(fig_dir + '/frac_align.png')
+#plt.savefig(fig_dir + '/frac_align.png')
 # plt.show()
 
 plt.figure(figsize=(10,6))
@@ -277,44 +276,44 @@ sns.scatterplot(
 plt.xlabel("Max Correlation")
 plt.ylabel("Fraction of High Alignment & Popularity at best lags")
 plt.title("Repos with High Popularity & Alignment at best lags")
-plt.savefig(fig_dir + '/frac_align_best_lag.png')
+#plt.savefig(fig_dir + '/frac_align_best_lag.png')
 # plt.show()
 
 
 
 # indices = metrics_df.sort_values('max_corr', ascending=False).head(3)['repo_idx']
-repo_desired = ['scikit-learn/scikit-learn', 'pytorch/pytorch', 'huggingface/transformers', 'opencv/opencv', 'google-research/bert', 'wandb/wandb', 'langchain-ai/langchain']
-indices = [repos.index(r) for r in repo_desired] 
-for idx in indices:
-    fig, ax1 = plt.subplots(figsize=(10, 4))
+# repo_desired = ['scikit-learn/scikit-learn', 'pytorch/pytorch', 'huggingface/transformers', 'opencv/opencv', 'google-research/bert', 'wandb/wandb', 'langchain-ai/langchain']
+# indices = [repos.index(r) for r in repo_desired] 
+# for idx in indices:
+#     fig, ax1 = plt.subplots(figsize=(10, 4))
 
-    # Plot popularity on left y-axis
-    ax1.plot(star_values[idx], label='Popularity', marker='o', color='tab:blue')
-    ax1.set_xlabel("Quarter")
-    ax1.set_ylabel("Popularity (stars)", color='tab:blue')
-    ax1.tick_params(axis='y', labelcolor='tab:blue')
+#     # Plot popularity on left y-axis
+#     ax1.plot(star_values[idx], label='Popularity', marker='o', color='tab:blue')
+#     ax1.set_xlabel("Quarter")
+#     ax1.set_ylabel("Popularity (stars)", color='tab:blue')
+#     ax1.tick_params(axis='y', labelcolor='tab:blue')
 
-    # Create a second y-axis for similarity
-    ax2 = ax1.twinx()
-    ax2.plot(similarity_values[idx], label='Similarity', marker='x', color='tab:red', linestyle = 'none')
-    ax2.set_ylabel("Similarity", color='tab:red')
-    ax2.tick_params(axis='y', labelcolor='tab:red')
+#     # Create a second y-axis for similarity
+#     ax2 = ax1.twinx()
+#     ax2.plot(similarity_values[idx], label='Similarity', marker='x', color='tab:red', linestyle = 'none')
+#     ax2.set_ylabel("Similarity", color='tab:red')
+#     ax2.tick_params(axis='y', labelcolor='tab:red')
 
-    # Combine legends
-    lines_1, labels_1 = ax1.get_legend_handles_labels()
-    lines_2, labels_2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper left')
+#     # Combine legends
+#     lines_1, labels_1 = ax1.get_legend_handles_labels()
+#     lines_2, labels_2 = ax2.get_legend_handles_labels()
+#     ax1.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper left')
 
-    plt.title(f"Repository {repos[idx]} Popularity vs Similarity Over Time")
-    plt.savefig(fig_dir + f'/repo_{repos[idx].replace('/', '_')}.png')
-    plt.tight_layout()
+#     plt.title(f"Repository {repos[idx]} Popularity vs Similarity Over Time")
+#     #plt.savefig(fig_dir + f'/repo_{repos[idx].replace('/', '_')}.png')
+#     plt.tight_layout()
     # plt.show()
 # repo_desired = ['scikit-learn/scikit-learn', 'pytorch/pytorch', 'huggingface/transformers', 'opencv/opencv', 'google-research/bert', 'wandb/wandb', 'langchain-ai/langchain']
 # indices = [repos.index(r) for r in repo_desired] 
     
 sns.pairplot(metrics_df[['pearson_corr', 'spearman_corr', 'mean_popularity', 'mean_similarity', 'frac_high_alignment_popularity']])
 plt.suptitle("Pairwise Relationships Between Metrics", y=1.02)
-plt.savefig(fig_dir + '/pairplot.png')
+#plt.savefig(fig_dir + '/pairplot.png')
 # plt.show()
 
 metrics_list = []
@@ -419,7 +418,7 @@ ax1.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper left')
 plt.title("Mean Similarity Trend Over Time with Repo Creation and Peak Popularity")
 plt.grid(alpha=0.3)
 plt.tight_layout()
-plt.savefig(fig_dir + '/sim_over_time_vs_creation_peak.png')
+#plt.savefig(fig_dir + '/sim_over_time_vs_creation_peak.png')
 # plt.show()
 
 
@@ -441,7 +440,7 @@ plt.xlabel("Quarter")
 plt.ylabel("Number of Postings")
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig(fig_dir + '/job_date_variation.png')
+#plt.savefig(fig_dir + '/job_date_variation.png')
 # plt.show()
 
 # Plot 2: Horizontal bar chart of job mapped title counts
@@ -454,5 +453,5 @@ plt.xlabel("Number of Postings")
 plt.ylabel("Job Mapped Title")
 plt.gca().invert_yaxis()  # largest on top
 plt.tight_layout()
-plt.savefig(fig_dir + '/job_title_variation.png')
+#plt.savefig(fig_dir + '/job_title_variation.png')
 plt.show()

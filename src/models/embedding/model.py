@@ -15,7 +15,7 @@ import nltk
 from IPython.display import display, HTML
 from nltk.corpus import stopwords
 
-src_path = Path(__file__).resolve().parent.parent
+src_path = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(src_path))
 
 from utils.paths import (
@@ -27,11 +27,6 @@ from utils.paths import (
     HEURISTIC_KWS,
     TOPIC_KWS,
 )
-
-# ---------------------------------------------------------------------------------
-# --------------------------- (Shared) Create Embedding ---------------------------
-# ---------------------------------------------------------------------------------
-
 
 def skip_if_exists(path: str | Path):
     if not isinstance(path, Path):
@@ -205,13 +200,13 @@ class TextProcessor:
         except LookupError:
             nltk.download("stopwords")
         self.nlp = spacy.load("en_core_web_sm")
-        case_map = pd.read_csv(DATA_DICT["github"]["tags"]["case_map"])
-        self.case_map_dict = dict(zip(case_map["lower"], case_map["proper"]))
+        # case_map = pd.read_csv(DATA_DICT["github"]["tags"]["case_map"])
+        # self.case_map_dict = dict(zip(case_map["lower"], case_map["proper"]))
         self.stopwords = set(stopwords.words("english"))
         self.lemmatize = lemmatize
 
-    def case_correct_word(self, word: str):
-        return self.case_map_dict.get(word.lower(), word)
+    # def case_correct_word(self, word: str):
+    #     return self.case_map_dict.get(word.lower(), word)
 
     def filter_stopwords(self, doc: spacy.tokens.Doc, contain):
         for i, token in enumerate(doc):
@@ -244,8 +239,8 @@ class TextProcessor:
         out, html = [], []
         for i in range(len(doc)):
             obj = doc[i].lemma_ if self.lemmatize else doc[i].text
-            if self.case_correct:
-                obj = self.case_correct_word(obj)
+            # if self.case_correct:
+            #     obj = self.case_correct_word(obj)
             obj += doc[i].whitespace_
             if contain[i]:
                 out.append(obj)
@@ -341,7 +336,7 @@ class JobTextProcessor(TextProcessor):
                 return True
         return False
 
-    def submethod(self, contain, doc, *methods, logical_operation=any, **kwargs):
+    def submethod(self, doc, contain, *methods, logical_operation=any, **kwargs):
         for sentence in doc.sents:
             sentence_doc = self.nlp(sentence.text)
             truth_values = [
@@ -561,7 +556,7 @@ class RepositoryTextProcessor(TextProcessor):
         super().__init__(**kwargs)
         self.readme_cleaner = ReadmeCleaner(noise_patterns=readme_noise_section_pattern)
 
-    def submethod(self, contain, doc):
+    def submethod(self, doc, contain):
         return contain
 
 

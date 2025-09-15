@@ -15,7 +15,7 @@ sys.path.append(str(src_path))
 
 from utils.paths import DATA_DICT
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN") 
 
 class GitHubGraphQL: 
     def __init__(self, repo_name, github_token, schema_filepath = DATA_DICT['gql']['schema'], **kwargs):
@@ -45,7 +45,6 @@ class GitHubGraphQL:
             **self.client_kwargs
         )
         return client
-        
         
     def run_query(self, query: Path | str, client = None, variables: dict = None, rate_wait = True):
         if client is None:
@@ -157,6 +156,7 @@ class GitHubGraphQL:
             # results = results['repository']['readme']['text']
         return results
     
+    
 def get_star_df(repository, stars):
     df = pd.DataFrame(stars, columns=["starred_at"])
     
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     include_stars = args.include_stars
     
-    collate_all_repositories()
+    # collate_all_repositories()
     repos = pd.read_csv(DATA_DICT['github']['repositories']['names']['all'])['repository'].tolist()
     # properties = ['description', 'topics', 'readme']
     # if include_stars == 'True': properties.append('stars')
@@ -238,7 +238,7 @@ if __name__ == "__main__":
                 results[property] = fetcher.fetch_property(property)
             # print(results)
             if include_stars == 'True':
-                get_star_df(repo, results['stars']).to_csv(DATA_DICT['github']['star_count'] / f'{fetcher.owner}_{fetcher.name}.csv', index = False)
+                get_star_df(repo, results['stars']).to_csv(DATA_DICT['github']['stars_dir'] / f'{fetcher.owner}_{fetcher.name}.csv')
                 results.pop('stars')
             # results['topics'] = ','.join(results['topics'])
             print(results)

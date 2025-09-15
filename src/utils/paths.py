@@ -270,52 +270,10 @@ DATA_DICT: DataDict = {
             "intersection_lemmatize_fuzzy": DATA_PATH
             / "weak_model_v1"
             / "intersection_lemmatize_fuzzy.csv",
-            # Evaluation summary output
-            # "evaluation": {
-            # "v1_a_run": EVAL_DIR / "eval_v1_a_run.csv",
-            # "v1_b_run": EVAL_DIR / "eval_v1_b_run.csv",
-            # "v1_c_run": EVAL_DIR / "eval_v1_c_run.csv",
-            # "v2_a_run": EVAL_DIR / "eval_v2_a_run.csv",
-            # "v2_b_run": EVAL_DIR / "eval_v2_b_run.csv",
-            # "v2_c_run": EVAL_DIR / "eval_v2_c_run.csv",
-            # "v1_b_pca64_run": EVAL_DIR / "eval_v1_b_pca64_run.csv",
-            # "v1_b_pca128_run": EVAL_DIR / "eval_v1_b_pca128_run.csv",
-            # "v1_b_pca256_run": EVAL_DIR / "eval_v1_b_pca256_run.csv",
-            # "v2_b_pca64_run": EVAL_DIR / "eval_v2_b_pca64_run.csv",
-            # "v2_b_pca128_run": EVAL_DIR / "eval_v2_b_pca128_run.csv",
-            # "v2_b_pca256_run": EVAL_DIR / "eval_v2_b_pca256_run.csv",
-            # "v2_c_pca64_run": EVAL_DIR / "eval_v2_c_pca64_run.csv",
-            # "v2_c_pca128_run": EVAL_DIR / "eval_v2_c_pca128_run.csv",
-            # "v2_c_pca256_run": EVAL_DIR / "eval_v2_c_pca256_run.csv",
-            # "v1_a_per_category": EVAL_DIR / "eval_v1_a_per_category.csv",
-            # "v1_b_per_category": EVAL_DIR / "eval_v1_b_per_category.csv",
-            # "v1_c_per_category": EVAL_DIR / "eval_v1_c_per_category.csv",
-            # "v2_a_per_category": EVAL_DIR / "eval_v2_a_per_category.csv",
-            # "v2_b_per_category": EVAL_DIR / "eval_v2_b_per_category.csv",
-            # "v2_c_per_category": EVAL_DIR / "eval_v2_c_per_category.csv",
-            # "v1_b_pca64_per_category": EVAL_DIR
-            # / "eval_v1_b_pca64_per_category.csv",
-            # "v1_b_pca128_per_category": EVAL_DIR
-            # / "eval_v1_b_pca128_per_category.csv",
-            # "v1_b_pca256_per_category": EVAL_DIR
-            # / "eval_v1_b_pca256_per_category.csv",
-            # "v2_b_pca64_per_category": EVAL_DIR
-            # / "eval_v2_b_pca64_per_category.csv",
-            # "v2_b_pca128_per_category": EVAL_DIR
-            # / "eval_v2_b_pca128_per_category.csv",
-            # "v2_b_pca256_per_category": EVAL_DIR
-            # / "eval_v2_b_pca256_per_category.csv",
-            # "v2_c_pca64_per_category": EVAL_DIR
-            # / "eval_v2_c_pca64_per_category.csv",
-            # "v2_c_pca128_per_category": EVAL_DIR
-            # / "eval_v2_c_pca128_per_category.csv",
-            # "v2_c_pca256_per_category": EVAL_DIR
-            # / "eval_v2_c_pca256_per_category.csv",
-            # },
         },
         "weak_v2": {
             # Keyword glossary (input)
-            "kws": TAGS_DIR / "keyword_category_glossary.csv",
+            "kws": DATA_PATH / 'weak_model' / "keyword_category_glossary.csv",
             # Output files for jobs
             "jobs": DATA_PATH / "weak_model_v2" / "jobs_weak_count.csv",
             "jobs_lemmatize": DATA_PATH
@@ -345,51 +303,8 @@ DATA_DICT: DataDict = {
             "intersection_lemmatize_fuzzy": DATA_PATH
             / "weak_model_v2"
             / "intersection_lemmatize_fuzzy.csv",
-            # Evaluation summary output
-            # "evaluation": {
-            # "v1_a_run": EVAL_DIR / "eval_v1_a_run.csv",
-            # "v1_b_run": EVAL_DIR / "eval_v1_b_run.csv",
-            # "v1_c_run": EVAL_DIR / "eval_v1_c_run.csv",
-            # "v2_a_run": EVAL_DIR / "eval_v2_a_run.csv",
-            # "v2_b_run": EVAL_DIR / "eval_v2_b_run.csv",
-            # "v2_c_run": EVAL_DIR / "eval_v2_c_run.csv",
-            # "v1_b_pca64_run": EVAL_DIR / "eval_v1_b_pca64_run.csv",
-            # "v1_b_pca128_run": EVAL_DIR / "eval_v1_b_pca128_run.csv",
-            # "v1_b_pca256_run": EVAL_DIR / "eval_v1_b_pca256_run.csv",
-            # "v2_b_pca64_run": EVAL_DIR / "eval_v2_b_pca64_run.csv",
-            # "v2_b_pca128_run": EVAL_DIR / "eval_v2_b_pca128_run.csv",
-            # "v2_b_pca256_run": EVAL_DIR / "eval_v2_b_pca256_run.csv",
-            # "v2_c_pca64_run": EVAL_DIR / "eval_v2_c_pca64_run.csv",
-            # "v2_c_pca128_run": EVAL_DIR / "eval_v2_c_pca128_run.csv",
-            # "v2_c_pca256_run": EVAL_DIR / "eval_v2_c_pca256_run.csv",
-            # "v1_a_per_category": EVAL_DIR / "eval_v1_a_per_category.csv",
-            # "v1_b_per_category": EVAL_DIR / "eval_v1_b_per_category.csv",
-            # "v1_c_per_category": EVAL_DIR / "eval_v1_c_per_category.csv",
-            # "v2_a_per_category": EVAL_DIR / "eval_v2_a_per_category.csv",
-            # "v2_b_per_category": EVAL_DIR / "eval_v2_b_per_category.csv",
-            # "v2_c_per_category": EVAL_DIR / "eval_v2_c_per_category.csv",
-            # "v1_b_pca64_per_category": EVAL_DIR
-            # / "eval_v1_b_pca64_per_category.csv",
-            # "v1_b_pca128_per_category": EVAL_DIR
-            # / "eval_v1_b_pca128_per_category.csv",
-            # "v1_b_pca256_per_category": EVAL_DIR
-            # / "eval_v1_b_pca256_per_category.csv",
-            # "v2_b_pca64_per_category": EVAL_DIR
-            # / "eval_v2_b_pca64_per_category.csv",
-            # "v2_b_pca128_per_category": EVAL_DIR
-            # / "eval_v2_b_pca128_per_category.csv",
-            # "v2_b_pca256_per_category": EVAL_DIR
-            # / "eval_v2_b_pca256_per_category.csv",
-            # "v2_c_pca64_per_category": EVAL_DIR
-            # / "eval_v2_c_pca64_per_category.csv",
-            # "v2_c_pca128_per_category": EVAL_DIR
-            # / "eval_v2_c_pca128_per_category.csv",
-            # "v2_c_pca256_per_category": EVAL_DIR
-            # / "eval_v2_c_pca256_per_category.csv",
-            # },
         },
     },
-    "ner_train": PROCESSED_DIR / "ner_training_data.jsonl",
     "embeddings": {
         "value_dir": EMBEDDING_DIR / "values",
         "v1": {
@@ -431,8 +346,6 @@ SENTENCE_MODEL: SentenceModelDict = {
 
 TEXT_VARIANTS = ["v1", "v2"]
 
-MODEL = "jjzha/jobspanbert-base-cased"
-
 
 POS_TAGS = [
     "ADJ",
@@ -467,6 +380,7 @@ HEURISTIC_KWS = [
     "qualifications",
     "qualification",
 ]
+
 TOPIC_KWS = [
     "deep learning",
     "machine learning",

@@ -198,14 +198,16 @@ PREPROCESSING_CONFIG = {
 
 if __name__ == "__main__":
     out_columns = ["job_id", "date", "month", "title", "mapped_title", "description"]
-    for source, config in PREPROCESSING_CONFIG.items():
-        obj = PreprocessJobsData(
-            source, config, intermediate_dir=INTERMEDIATE_DIR, raw_dir=RAW_DIR
-        )
-        obj.save_intermediate()
-
+    # for source, config in PREPROCESSING_CONFIG.items():
+    #     obj = PreprocessJobsData(
+    #         source, config, intermediate_dir=INTERMEDIATE_DIR, raw_dir=RAW_DIR
+    #     )
+    #     obj.save_intermediate()
+    source = 'source_4'
+    obj = PreprocessJobsData(source, PREPROCESSING_CONFIG[source])
+    obj.save_intermediate()
     PreprocessJobsData.create_final(
         select_columns=out_columns,
         from_dir=INTERMEDIATE_DIR,
-        out_file=DATA_DICT["jobs2"],
+        out_file=DATA_DICT["jobs"],
     )

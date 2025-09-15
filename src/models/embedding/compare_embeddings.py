@@ -15,7 +15,6 @@ sys.path.append(str(src_path))
 from utils.plots import n_colors
 from utils.paths import DATA_DICT, SENTENCE_MODEL
 
-
 class DotDict(dict):
     """
     Upgrades a dict object so that we can create, access, edit and delete elements with .notation!
@@ -34,7 +33,6 @@ class DotDict(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
-
 
 class UtilityClass(DotDict):
     def show_schema(self, obj=None, verbose=True):
@@ -68,12 +66,10 @@ class UtilityClass(DotDict):
 
         return schema
 
-
 def _maybe_reduced_path(base_path: Path, dr: str | None, dr_dim: int | None) -> Path:
     if dr == "pca" and dr_dim:
         return base_path.with_name(base_path.stem + f"_pca{dr_dim}" + base_path.suffix)
     return base_path
-
 
 class DataLoader(UtilityClass):
     def __init__(
@@ -291,26 +287,6 @@ class SimilarityCalculator(UtilityClass):
         # if drop_zero:
         #     return merged[merged["stars"] != 0]
         # return merged
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
 class EmbeddingSimilarity:
     def __init__(self, sentence_model_index, text_variant):
@@ -603,7 +579,6 @@ class EmbeddingSimilarity:
             return merged[merged["stars"] != 0]
         return merged
 
-
 def plot_time_series(df, period_col="Q", star_col="stars", similarity_cols=None):
     if similarity_cols is None:
         similarity_cols = [col for col in df.columns if col.endswith("_similarity")]
@@ -626,7 +601,6 @@ def plot_time_series(df, period_col="Q", star_col="stars", similarity_cols=None)
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
-
 
 def plot_similarity_ribbon(df, period_col="Q", remove_zeros=True):
     # Convert period index to string for x-axis labels if needed
@@ -660,54 +634,55 @@ def plot_similarity_ribbon(df, period_col="Q", remove_zeros=True):
     plt.tight_layout()
     plt.show()
 
+if __name__ == '__main__':
 
-# sim = EmbeddingSimilarity("b", "v1")
+    sim = EmbeddingSimilarity("b", "v1")
 
-# df = sim.repo_stars_similarity(
-#     "pytorch/pytorch",
-#     "Q",
-#     np.mean,
-#     np.median,
-#     np.count_nonzero,
-#     np.sum,
-#     np.min,
-#     np.max,
-#     np.std,
-#     np.var,
-#     drop_zero=True,
-# )
-
-
-# similarity_cols = [col for col in df.columns if col.endswith("_similarity")]
-
-# plot_time_series(
-#     df, period_col="Q", star_col="stars_norm", similarity_cols=similarity_cols
-# )
-# plot_similarity_ribbon(df)
-
-# -----------------------------------------------------
-# -------------- COMPARISON of v1 and v2 --------------
-# -----------------------------------------------------
-
-# sim_v1 = EmbeddingSimilarity("b", "v1")
-# sim_v2 = EmbeddingSimilarity("b", "v2")
-
-# long, small = 20, 10
-
-# fig, axs = plt.subplots(1, 2, figsize=(long, long))
-
-# sim_v1.candlestick(orientation="horizontal", showfliers=False, ax=axs[0], grid="both")
-# sim_v2.candlestick(orientation="horizontal", showfliers=False, ax=axs[1], grid="both")
-
-# fig, axs = plt.subplots(2, 2, figsize=(long, small))
-# bins = 30
-
-# sim_v1.plot_stats(bins=bins, axs=[axs[0][0], axs[0][1]], ax_lab_add="V1")
-# sim_v2.plot_stats(bins=bins, axs=[axs[1][0], axs[1][1]], ax_lab_add="V2")
+    df = sim.repo_stars_similarity(
+        "pytorch/pytorch",
+        "Q",
+        np.mean,
+        np.median,
+        np.count_nonzero,
+        np.sum,
+        np.min,
+        np.max,
+        np.std,
+        np.var,
+        drop_zero=True,
+    )
 
 
-# -----------------------------------------------------
-# -------------- TIME-SERIES Analysis--- --------------
-# -----------------------------------------------------
-a = SimilarityCalculator(None, "v2", "b", "pca", 64)
-a.data.repo.embedding[0]
+    similarity_cols = [col for col in df.columns if col.endswith("_similarity")]
+
+    plot_time_series(
+        df, period_col="Q", star_col="stars_norm", similarity_cols=similarity_cols
+    )
+    plot_similarity_ribbon(df)
+
+    # -----------------------------------------------------
+    # -------------- COMPARISON of v1 and v2 --------------
+    # -----------------------------------------------------
+
+    sim_v1 = EmbeddingSimilarity("b", "v1")
+    sim_v2 = EmbeddingSimilarity("b", "v2")
+
+    long, small = 20, 10
+
+    fig, axs = plt.subplots(1, 2, figsize=(long, long))
+
+    sim_v1.candlestick(orientation="horizontal", showfliers=False, ax=axs[0], grid="both")
+    sim_v2.candlestick(orientation="horizontal", showfliers=False, ax=axs[1], grid="both")
+
+    fig, axs = plt.subplots(2, 2, figsize=(long, small))
+    bins = 30
+
+    sim_v1.plot_stats(bins=bins, axs=[axs[0][0], axs[0][1]], ax_lab_add="V1")
+    sim_v2.plot_stats(bins=bins, axs=[axs[1][0], axs[1][1]], ax_lab_add="V2")
+
+
+    # -----------------------------------------------------
+    # -------------- TIME-SERIES Analysis--- --------------
+    # -----------------------------------------------------
+    a = SimilarityCalculator(None, "v2", "b", "pca", 64)
+    a.data.repo.embedding[0]

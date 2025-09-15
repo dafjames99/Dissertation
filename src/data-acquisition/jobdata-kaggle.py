@@ -35,5 +35,9 @@ class KaggleDownloader:
 
 if __name__ == "__main__":
     kdl = KaggleDownloader()
-    for source, source_config in DATA_DICT["job_posting_sources"].items():
-        kdl.download_to_dir(source_config["handle"], dir=RAW_DIR / source)
+    # for source, source_config in DATA_DICT["job_posting_sources"].items():
+    #     kdl.download_to_dir(source_config["handle"], dir=RAW_DIR / source)
+    source = 'source_4'
+    source_config = DATA_DICT['job_posting_sources'][source]
+    kdl.download_to_dir(source_config['handle'], dir = RAW_DIR / source)
+    

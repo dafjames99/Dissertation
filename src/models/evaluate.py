@@ -15,12 +15,11 @@ from utils.paths import DATA_DICT, EMBEDDING_DIR, EVAL_DIR  # noqa: E402
 from models.embedding.compare_embeddings import SimilarityCalculator  # noqa: E402
 from models.weak.model import IntersectionFeatures  # noqa: E402
 
-
 # ---------------------------- Labels (built once) ----------------------------
-kws = pd.read_csv(DATA_DICT["models"]["weak_v1"]["kws"])
+kws = pd.read_csv(DATA_DICT["models"]["weak_v2"]["kws"])
 kws["Category"] = kws["Category"].astype(str).str.strip()
 
-intersect = IntersectionFeatures(DATA_DICT['models']['weak_v1']['intersection_lemmatize_fuzzy']) #I matrix where I[i, j] = [(term, match_type), ...]
+intersect = IntersectionFeatures(DATA_DICT['models']['weak_v2']['intersection_lemmatize_fuzzy']) #I matrix where I[i, j] = [(term, match_type), ...]
 
 repos = intersect.df.index.tolist()  # R repos (ids)
 jobs = intersect.df.columns.astype(int).tolist()  # J jobs (ids)
@@ -30,7 +29,6 @@ R, J, K = len(repos), len(jobs), len(categories)
 repo_idx = {r: i for i, r in enumerate(repos)}
 job_idx = {j: i for i, j in enumerate(jobs)}
 cat_idx = {c: i for i, c in enumerate(categories)}
-
 
 def _build_matches(intersect): 
     """
@@ -50,11 +48,10 @@ def _build_matches(intersect):
             matches[(i, j)] = cell_
     return matches
 
-
 matches = _build_matches(intersect)
 
 B = np.zeros((R, J, K), dtype=np.int8)
-C = np.zeros_like(B, dtype=np.int32)  # optional counts
+C = np.zeros_like(B, dtype=np.int32)
 
 for (r, j), match_list in matches.items():
     i, jj = repo_idx[r], job_idx[j]
@@ -70,8 +67,6 @@ for (r, j), match_list in matches.items():
     for k in seen_per_cat:
         B[i, jj, k] = 1 # Binary Tensor
 
-
-# ---------------------------- Evaluation helpers ----------------------------
 def eval_category(k, S, B, topk=(1, 5, 10)):
     APs, ndcgs = [], []
     p_at_k = {k_: [] for k_ in topk}
@@ -183,11 +178,9 @@ def evaluate_run(S, B):
     }
 
 
-# ---------------------------- Config discovery ----------------------------
 def _embeddings_root() -> Path:
     # derive embeddings root from existing paths
     return EMBEDDING_DIR
-
 
 def discover_configs() -> list[tuple[str, str, str | None, int | None]]:
     root = _embeddings_root()
@@ -223,10 +216,7 @@ def discover_configs() -> list[tuple[str, str, str | None, int | None]]:
             seen.add(cfg)
     return uniq
 
-
-# ---------------------------- Main loop ----------------------------
 def main(path: Path = None):
-    # destination directory (agnostic to keyed mapping)
     if path is None:
         eval_dir = EVAL_DIR
         eval_dir.mkdir(parents=True, exist_ok=True)
@@ -244,19 +234,16 @@ def main(path: Path = None):
     for text_variant, sent_model_idx, dr, dr_dim in tqdm(
         configs, desc="Evaluating configs", unit="cfg"
     ):
-        # compute similarity
         sim = SimilarityCalculator(
             text_variant=text_variant,
             sentence_model_index=sent_model_idx,
             dr=dr,
             dr_dim=dr_dim,
         )
-        S = sim.matrix  # (R x J)
+        S = sim.matrix
 
-        # evaluate
         res = evaluate_run(S, B)
 
-        # run-level row
         run_row = {
             "run_id": f"{text_variant}_{sent_model_idx}"
             + (f"_pca{dr_dim}" if dr == "pca" and dr_dim else ""),
@@ -283,7 +270,6 @@ def main(path: Path = None):
         }
         run_rows.append(run_row)
 
-        # per-category rows
         for idx, cat_name in enumerate(categories):
             cres = res["category_results"].get(cat_name, {})
             per_cat_rows.append(
